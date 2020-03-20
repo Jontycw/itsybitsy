@@ -8,6 +8,7 @@ namespace ItsyBitsy.Domain
 {
     public interface IFeeder
     {
+        bool HasLinks();
         string GetLink();
         void AddLinks(IEnumerable<string> links);
     }
@@ -32,6 +33,11 @@ namespace ItsyBitsy.Domain
             {
                 _processQueue.Add(link);
             }
+        }
+
+        public bool HasLinks()
+        {
+            return _processQueue.IsCompleted;
         }
 
         public string GetLink()

@@ -9,7 +9,6 @@ namespace ItsyBitsy.Domain
     public interface IProcessor
     {
         void Dispose();
-
         IEnumerable<string> Process(string response);
         Task<IEnumerable<string>> ProcessAsync(string response);
     }
