@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ItsyBitsy.Console", "ItsyBitsy.Console\ItsyBitsy.Console.csproj", "{A96A88CE-0401-4C69-B8F1-D83DF7D9698B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ItsyBitsy.Crawler", "ItsyBitsy.Console\ItsyBitsy.Crawler.csproj", "{A96A88CE-0401-4C69-B8F1-D83DF7D9698B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItsyBitsy.Data", "ItsyBitsy.Data\ItsyBitsy.Data.csproj", "{A7086CA3-7B79-4F43-A4F8-84C1CCC7912D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItsyBitsy.Domain", "ItsyBitsy.Domain\ItsyBitsy.Domain.csproj", "{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{A7086CA3-7B79-4F43-A4F8-84C1CCC7912D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7086CA3-7B79-4F43-A4F8-84C1CCC7912D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7086CA3-7B79-4F43-A4F8-84C1CCC7912D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
