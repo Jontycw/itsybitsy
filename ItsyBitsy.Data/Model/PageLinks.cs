@@ -8,16 +8,19 @@ namespace ItsyBitsy.Data
 {
     public class PageLinks
     {
-        [Key, ForeignKey("PageId")]
         public Page Page { get; set; }
+
+        [Key, Column(Order = 0), ForeignKey("Page")]
         public int PageId { get; set; }
 
-        [Key, ForeignKey("ParentPageId")]
         public Page ParentPage { get; set; }
+
+        [Key, Column(Order = 1), ForeignKey("ParentPage")]
         public int ParentPageId { get; set; }
 
-        [Key, ForeignKey("SessionId")]
-        public Session Session { get; set; }
+        public virtual Session Session { get; set; }
+
+        [Key, Column(Order = 2), ForeignKey("Session")]
         public int SessionId { get; set; }
     }
 }

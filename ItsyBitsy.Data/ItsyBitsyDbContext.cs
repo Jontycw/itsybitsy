@@ -9,7 +9,7 @@ namespace ItsyBitsy.Data
 {
     public class ItsyBitsyDbContext : DbContext
     {
-        protected ItsyBitsyDbContext()
+        public ItsyBitsyDbContext()
             :base("DefaultConnection")
         {
         }

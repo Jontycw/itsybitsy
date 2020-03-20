@@ -20,14 +20,14 @@ namespace ItsyBitsy.Data
         [DataType(DataType.DateTime)]
         public DateTime TimeStamp { get; set; }
 
-        [ForeignKey("WebsiteId")]
         public virtual Website Website { get; set; }
 
+        [ForeignKey("Website")]
         public int WebsiteId { get; set; }
 
-        [ForeignKey("SessionId")]
         public virtual Session Session { get; set; }
 
+        [ForeignKey("Session")]
         public int SessionId { get; set; }
     }
 }
