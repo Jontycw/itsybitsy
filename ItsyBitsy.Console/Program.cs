@@ -17,7 +17,7 @@ namespace ItsyBitsy.Crawler
 
             while(feeder.HasLinks())
             {
-                var nextLink = feeder.GetLink();
+                var nextLink = feeder.GetNextLink();
                 var response = downloader.Download(nextLink);
                 var newLinks = processor.Process(response);
                 feeder.AddLinks(newLinks);
