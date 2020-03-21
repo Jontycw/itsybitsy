@@ -4,7 +4,12 @@ using System.Text;
 
 namespace ItsyBitsy.Domain
 {
-    public class Crawler
+    public interface ICrawler
+    {
+        void Start();
+    }
+
+    public class Crawler : ICrawler
     {
         private readonly IFeeder _feeder;
         private readonly IProcessor _processor;
@@ -15,6 +20,17 @@ namespace ItsyBitsy.Domain
             _feeder = feeder;
             _downloader = downloader;
             _processor = processor;
+        }
+
+        public void Start()
+        {
+            while (_feeder.HasLinks())
+            {
+                var nextLink = _feeder.GetNextLink();
+                var response = _downloader.Download(nextLink);
+                var newLinks = _processor.Process(response);
+                _feeder.AddLinks(newLinks);
+            }
         }
     }
 }

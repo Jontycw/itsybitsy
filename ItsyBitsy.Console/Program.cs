@@ -14,22 +14,14 @@ namespace ItsyBitsy.Crawler
             container.Register<IFeeder, Feeder>();
             container.Register<IDownloader, Downloader>();
             container.Register<IProcessor, Processor>();
+            container.Register<ICrawler, Domain.Crawler>();
             container.Verify();
         }
 
         static void Main(string[] args)
         {
-            var feeder = container.GetInstance<IFeeder>();
-            var downloader = container.GetInstance<IDownloader>();
-            var processor = container.GetInstance<IProcessor>();
-
-            while(feeder.HasLinks())
-            {
-                var nextLink = feeder.GetNextLink();
-                var response = downloader.Download(nextLink);
-                var newLinks = processor.Process(response);
-                feeder.AddLinks(newLinks);
-            }
+            var crawler = container.GetInstance<ICrawler>();
+            crawler.Start();
         }
     }
 }
