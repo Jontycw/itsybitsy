@@ -17,9 +17,9 @@ namespace ItsyBitsy.Domain
     {
         private readonly BlockingCollection<string> _processQueue;
 
-        public Feeder(BlockingCollection<string> processQueue)
+        public Feeder()
         {
-            _processQueue = processQueue;
+            _processQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), 10000);
         }
 
         /// <summary>
