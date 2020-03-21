@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using HtmlAgilityPack;
 
 namespace ItsyBitsy.Domain
 {
@@ -40,7 +41,22 @@ namespace ItsyBitsy.Domain
         /// <returns></returns>
         public string Download(string uri)
         {
-            throw new NotImplementedException();
+            HtmlWeb web = new HtmlWeb();
+            HtmlDocument doc = new HtmlDocument();
+            doc = web.Load(uri);
+
+
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href]"))
+            {
+                HtmlAttribute att = link.Attributes["href"];
+
+                if (att.Value.Contains("a"))
+                {
+                    Console.WriteLine(att.Value);
+                }
+            }
+
+            return "";
         }
 
         public Task<string> DownloadAsync(string uri)
