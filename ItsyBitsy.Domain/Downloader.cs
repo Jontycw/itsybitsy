@@ -9,7 +9,6 @@ namespace ItsyBitsy.Domain
 {
     public interface IDownloader
     {
-        public string Download(string uri);
         public Task<string> DownloadAsync(string uri);
         void Dispose();
     }
@@ -38,30 +37,10 @@ namespace ItsyBitsy.Domain
         /// Downloads web content from a given uri.
         /// </summary>
         /// <param name="uri">The url to download</param>
-        /// <returns></returns>
-        public string Download(string uri)
+        /// <returns>html content</returns>
+        public async Task<string> DownloadAsync(string uri)
         {
-            HtmlWeb web = new HtmlWeb();
-            HtmlDocument doc = new HtmlDocument();
-            doc = web.Load(uri);
-
-
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href]"))
-            {
-                HtmlAttribute att = link.Attributes["href"];
-
-                if (att.Value.Contains("a"))
-                {
-                    Console.WriteLine(att.Value);
-                }
-            }
-
-            return "";
-        }
-
-        public Task<string> DownloadAsync(string uri)
-        {
-            throw new NotImplementedException();
+            return await _client.GetStringAsync(uri);
         }
 
         public void Dispose()

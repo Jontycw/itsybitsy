@@ -1,27 +1,24 @@
 ﻿using ItsyBitsy.Domain;
-using SimpleInjector;
 using System;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace ItsyBitsy.Crawler
 {
     public class Program
     {
-        static readonly Container container;
         static Program()
         {
-            container = new Container();
-            container.Register<IFeeder, Feeder>();
-            container.Register<IDownloader, Downloader>();
-            container.Register<IProcessor, Processor>();
-            container.Register<ICrawler, Domain.Crawler>();
-            container.Verify();
+
         }
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            var crawler = container.GetInstance<ICrawler>();
-            crawler.Start();
+            var feeder = new Feeder();
+            var downloader = new Downloader();
+            var processor = new Processor();
+            var crawler = new Domain.Crawler(feeder, processor, downloader);
+            await crawler.StartAsync();
         }
     }
 }

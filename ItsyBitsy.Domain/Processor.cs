@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -8,21 +9,16 @@ namespace ItsyBitsy.Domain
 {
     public interface IProcessor
     {
-        void Dispose();
         IEnumerable<string> Process(string response);
         Task<IEnumerable<string>> ProcessAsync(string response);
     }
 
-    public class Processor : IProcessor, IDisposable
+    public class Processor : IProcessor
     {
         private bool disposed = false;
-        private readonly IDownloader _downloader;
-        private readonly IFeeder _feeder;
 
-        public Processor(IDownloader downloader, IFeeder feeder)
+        public Processor()
         {
-            _downloader = downloader;
-            _feeder = feeder;
         }
 
         /// <summary>
@@ -31,34 +27,20 @@ namespace ItsyBitsy.Domain
         /// <param name="responseBody">internet response</param>
         public IEnumerable<string> Process(string response)
         {
-            throw new NotImplementedException();
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(response);
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href]"))
+            {
+                HtmlAttribute att = link.Attributes["href"];
+                var pageLink = att.Value;
+                Console.WriteLine(pageLink);
+                yield return pageLink;
+            }
         }
 
         public Task<IEnumerable<string>> ProcessAsync(string response)
         {
             throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-
-            if (disposing)
-                _downloader.Dispose();
-
-            disposed = true;
-        }
-
-        ~Processor()
-        {
-            Dispose(false);
         }
     }
 }

@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
 {
     public interface ICrawler
     {
-        void Start();
+        Task StartAsync();
     }
 
     public class Crawler : ICrawler
@@ -22,12 +23,12 @@ namespace ItsyBitsy.Domain
             _processor = processor;
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
             while (_feeder.HasLinks())
             {
                 var nextLink = _feeder.GetNextLink();
-                var response = _downloader.Download(nextLink);
+                var response = await _downloader.DownloadAsync(nextLink);
                 var newLinks = _processor.Process(response);
                 _feeder.AddLinks(newLinks);
             }
