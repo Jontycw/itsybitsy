@@ -15,8 +15,6 @@ namespace ItsyBitsy.Domain
 
     public class Processor : IProcessor
     {
-        private bool disposed = false;
-
         public Processor()
         {
         }

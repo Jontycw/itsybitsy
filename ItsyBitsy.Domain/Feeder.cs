@@ -13,13 +13,17 @@ namespace ItsyBitsy.Domain
         void AddLinks(IEnumerable<string> links);
     }
 
+    /// <summary>
+    /// Bug: This class will queue the same link multiple times, need to check if link has already been processed, and only allow 
+    /// new links to be returned when calling GetNextLink.
+    /// </summary>
     public class Feeder : IFeeder
     {
         private readonly BlockingCollection<string> _processQueue;
 
-        public Feeder()
+        public Feeder(int inMemorySize = 10000)
         {
-            _processQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), 10000);
+            _processQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), inMemorySize);
         }
 
         /// <summary>
@@ -35,9 +39,14 @@ namespace ItsyBitsy.Domain
             }
         }
 
+        public void CompleteAdding()
+        {
+            _processQueue.CompleteAdding();
+        }
+
         public bool HasLinks()
         {
-            return _processQueue.IsCompleted;
+            return _processQueue.Any();
         }
 
         public string GetNextLink()
