@@ -11,6 +11,7 @@ namespace ItsyBitsy.Domain
         bool HasLinks();
         string GetNextLink();
         void AddLinks(IEnumerable<string> links);
+        void AddLink(string link);
     }
 
     /// <summary>
@@ -20,10 +21,12 @@ namespace ItsyBitsy.Domain
     public class Feeder : IFeeder
     {
         private readonly BlockingCollection<string> _processQueue;
+        private HashSet<string> _alreadyCrawled;
 
         public Feeder(int inMemorySize = 10000)
         {
             _processQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), inMemorySize);
+            _alreadyCrawled = new HashSet<string>();
         }
 
         /// <summary>
@@ -35,8 +38,27 @@ namespace ItsyBitsy.Domain
         {
             foreach (var link in links)
             {
-                _processQueue.Add(link);
+                if (IsHttpUri(link) && _alreadyCrawled.Add(link))
+                {
+                    Console.WriteLine(link);
+                    _processQueue.Add(link);
+                }
             }
+        }
+
+        internal static bool IsHttpUri(string uri)
+        {
+            if (uri == null)
+                return false;
+
+            string scheme = new Uri(uri).Scheme;
+            return ((string.Compare("http", scheme, StringComparison.OrdinalIgnoreCase) == 0) ||
+                (string.Compare("https", scheme, StringComparison.OrdinalIgnoreCase) == 0));
+        }
+
+        public void AddLink(string link)
+        {
+            _processQueue.Add(link);
         }
 
         public void CompleteAdding()

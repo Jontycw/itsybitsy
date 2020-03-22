@@ -18,7 +18,7 @@ namespace ItsyBitsy.Domain
         private bool disposed = false;
         private readonly HttpClient _client;
 
-        public Downloader()
+        public Downloader(Uri host)
         {
             HttpClientHandler handler = new HttpClientHandler()
             {
@@ -31,6 +31,7 @@ namespace ItsyBitsy.Domain
             };
 
             _client = new HttpClient(handler);
+            _client.BaseAddress = host;
         }
 
         /// <summary>
@@ -40,7 +41,15 @@ namespace ItsyBitsy.Domain
         /// <returns>html content</returns>
         public async Task<string> DownloadAsync(string uri)
         {
-            return await _client.GetStringAsync(uri);
+            try
+            {
+                return await _client.GetStringAsync(uri);
+            }
+            catch(HttpRequestException e)
+            {
+                Console.WriteLine($"ERROR: {uri}, {e.Message}");
+                return null;
+            }
         }
 
         public void Dispose()

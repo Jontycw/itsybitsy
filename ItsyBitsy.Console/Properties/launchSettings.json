@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ItsyBitsy.Crawler": {
+      "commandName": "Project",
+      "commandLineArgs": "https://sudpave.co.za"
+    }
+  }
+}

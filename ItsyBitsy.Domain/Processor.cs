@@ -15,8 +15,10 @@ namespace ItsyBitsy.Domain
 
     public class Processor : IProcessor
     {
-        public Processor()
+        private readonly Uri _seed;
+        public Processor(Uri seed)
         {
+            _seed = seed;
         }
 
         /// <summary>
@@ -31,8 +33,8 @@ namespace ItsyBitsy.Domain
             {
                 HtmlAttribute att = link.Attributes["href"];
                 var pageLink = att.Value;
-                Console.WriteLine(pageLink);
-                yield return pageLink;
+                var absoluteUri = new Uri(_seed, pageLink).AbsoluteUri;
+                yield return absoluteUri;
             }
         }
 
