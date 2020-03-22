@@ -31,7 +31,7 @@ namespace ItsyBitsy.Domain
 
         /// <summary>
         /// Should add to _processQueue if there is space available. (limit 10000 items)
-        /// If the queue is full, excess items should be saved to the ProcessQueue databse table.
+        /// If the queue is full, excess items should be saved to the ProcessQueue database table.
         /// </summary>
         /// <param name="links"></param>
         public void AddLinks(IEnumerable<string> links)
