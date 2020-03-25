@@ -17,9 +17,8 @@ namespace ItsyBitsy.Data
         [DataType(DataType.DateTime)]
         public DateTime TimeStamp { get; set; }
 
-        public virtual Session Session { get; set; }
-
         [ForeignKey("Session")]
         public int SessionId { get; set; }
+        public virtual Session Session { get; set; }
     }
 }

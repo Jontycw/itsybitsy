@@ -29,5 +29,10 @@ namespace ItsyBitsy.Data
 
         [ForeignKey("Session")]
         public int SessionId { get; set; }
+
+        public virtual Page ParentPage { get; set; }
+
+        [ForeignKey("ParentPage")]
+        public int ParentPageId { get; set; }
     }
 }

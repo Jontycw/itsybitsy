@@ -11,7 +11,7 @@ namespace ItsyBitsy.Data
     public class ItsyBitsyDbContext : DbContext
     {
         public ItsyBitsyDbContext()
-            :base("DefaultConnection")
+            :base("ItsyBitsyDb")
         {
         }
 
@@ -23,7 +23,6 @@ namespace ItsyBitsy.Data
         public DbSet<Session> Session { get; set; }
         public DbSet<Website> Website { get; set; }
         public DbSet<Page> Page { get; set; }
-        public DbSet<PageLinks> PageLinks { get; set; }
         public DbSet<ProcessQueue> ProcessQueue { get; set; }
     }
 }
