@@ -86,7 +86,9 @@ namespace ItsyBitsy.Domain
                 case "image/jpeg": 
                 case "image/png":
                 case "image/gif":
-                case "image/x-icon": 
+                case "image/x-icon":
+                case "image/svg+xml":
+                case "image/svg":
                     return ContentType.Image;
                 case "application/pdf": 
                     return ContentType.Other;

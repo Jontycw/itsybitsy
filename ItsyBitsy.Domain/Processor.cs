@@ -10,8 +10,20 @@ namespace ItsyBitsy.Domain
 {
     public interface IProcessor
     {
-        IEnumerable<string> GetLinks(string content);
+        IEnumerable<PageLink> GetLinks(string content);
         Task<IEnumerable<string>> GetLinksAsync(string content);
+    }
+
+    public struct PageLink
+    {
+        public PageLink(string link, bool isContent)
+        {
+            IsContent = isContent;
+            Link = link;
+        }
+
+        public bool IsContent { get; }
+        public string Link { get; }
     }
 
     public class Processor : IProcessor
@@ -26,7 +38,7 @@ namespace ItsyBitsy.Domain
         /// Extracts data from an internet response.
         /// </summary>
         /// <param name="responseBody">internet response</param>
-        public IEnumerable<string> GetLinks(string content)
+        public IEnumerable<PageLink> GetLinks(string content)
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(content);
@@ -34,8 +46,8 @@ namespace ItsyBitsy.Domain
             {
                 HtmlAttribute att = link.Attributes["href"];
                 var pageLink = att.Value;
-                var absoluteUri = new Uri(_website.Seed, pageLink).AbsoluteUri;
-                yield return absoluteUri;
+                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri))
+                    yield return new PageLink(absoluteUri.ToString(), link.Name == "link");
             }
 
             foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src] | //img[@src]"))
@@ -43,7 +55,7 @@ namespace ItsyBitsy.Domain
                 HtmlAttribute att = link.Attributes["src"];
                 var pageLink = att.Value;
                 var absoluteUri = new Uri(_website.Seed, pageLink).AbsoluteUri;
-                yield return absoluteUri;
+                yield return new PageLink(absoluteUri.ToString(), true);
             }
         }
 

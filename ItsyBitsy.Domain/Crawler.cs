@@ -39,7 +39,9 @@ namespace ItsyBitsy.Domain
                 var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink?.ParentId);
                 if (downloadResult.IsSuccessCode && downloadResult.ContentType == ContentType.Html)
                 {
-                    var newLinks = _processor.GetLinks(downloadResult.Content).Where(x => x.StartsWith(seed));
+                    var newLinks = _processor.GetLinks(downloadResult.Content)
+                        .Where(x => x.IsContent || x.Link.StartsWith(seed))
+                        .Select(x => x.Link);
                     _feeder.AddLinks(newLinks, pageId);
                 }
             }
