@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <None Remove="AddInitialData.sql" />
+    <None Remove="Useful scripts.sql" />
   </ItemGroup>
 
   <ItemGroup>

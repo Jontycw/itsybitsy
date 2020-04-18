@@ -5,21 +5,22 @@ using System.Threading.Tasks;
 
 namespace ItsyBitsy.Crawler
 {
+    //todo: Find all paths to a page.
     public class Program
     {
         static async Task Main(string[] args)
         {
-            //change to get website Id
             var website = await GetWebsite(args);
-            var sesionId= await Repository.CreateNewSession();
+            var sessionId = await Repository.CreateNewSession();
 
             var feeder = new Feeder();
             var downloader = new Downloader(website.Seed);
             var processor = new Processor(website);
             feeder.AddSeed(website.Seed.ToString());
 
-            var crawler = new Domain.Crawler(feeder, processor, downloader, website, sesionId);
+            var crawler = new Domain.Crawler(feeder, processor, downloader, website, sessionId);
             await crawler.StartAsync();
+            await Repository.EndSession(sessionId);
             Console.WriteLine("Crawl Finished.");
         }
 

@@ -1,8 +1,7 @@
 {
   "profiles": {
     "ItsyBitsy.Crawler": {
-      "commandName": "Project",
-      "commandLineArgs": "1"
+      "commandName": "Project"
     }
   }
 }

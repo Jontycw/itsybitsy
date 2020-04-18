@@ -26,6 +26,18 @@ namespace ItsyBitsy.Domain
             return newPage.Id;
         }
 
+        public static async Task EndSession(int sessionId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            var session = new Session()
+            {
+                Id = sessionId,
+                EndTime = DateTime.Now
+            };
+            context.Entry(session).Property(x => x.EndTime).IsModified = true;
+            await context.SaveChangesAsync();
+        }
+
         public static async Task<int> CreateNewSession()
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();

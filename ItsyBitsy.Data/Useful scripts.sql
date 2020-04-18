@@ -5,3 +5,4 @@ from [Page] pageO
 		from [Page] pageI
 		where ParentPageId = PageO.Id
 		group by ParentPageId) crossRes
+where WebsiteId = 1
