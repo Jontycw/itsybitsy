@@ -38,7 +38,7 @@ namespace ItsyBitsy.Domain
                 yield return absoluteUri;
             }
 
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src]"))
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src] | //img[@src]"))
             {
                 HtmlAttribute att = link.Attributes["src"];
                 var pageLink = att.Value;

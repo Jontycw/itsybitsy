@@ -20,6 +20,7 @@ namespace ItsyBitsy.Crawler
 
             var crawler = new Domain.Crawler(feeder, processor, downloader, website, sesionId);
             await crawler.StartAsync();
+            Console.WriteLine("Crawl Finished.");
         }
 
         private static async Task<Website> GetWebsite(string[] args)

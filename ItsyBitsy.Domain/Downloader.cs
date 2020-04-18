@@ -48,22 +48,23 @@ namespace ItsyBitsy.Domain
 
             try
             {
+                Stopwatch watch = new Stopwatch();
+                watch.Start();
                 var getResult = await _client.GetAsync(uri);
-                result.Status = getResult.StatusCode.ToString();
+                watch.Stop();
+                result.Status = ((byte)getResult.StatusCode).ToString();
 
-                if(getResult.IsSuccessStatusCode)
+                if (getResult.IsSuccessStatusCode)
                 {
+                    result.IsSuccessCode = true;
                     var resultContent = getResult.Content;
-                    Stopwatch watch = new Stopwatch();
                     result.ContentType = GetContentType(resultContent.Headers.ContentType.MediaType);
 
-                    watch.Start();
                     result.Content = await resultContent.ReadAsStringAsync();
-                    watch.Stop();
                     result.DownloadTime = watch.ElapsedMilliseconds;
                 }
             }
-            catch(HttpRequestException e)
+            catch (HttpRequestException e)
             {
                 result.Exception = e;
                 Console.WriteLine($"ERROR: {uri}, {e.Message}");
@@ -77,9 +78,18 @@ namespace ItsyBitsy.Domain
             switch(mediaType)
             {
                 case "text/html": return ContentType.Html;
-                case "text/javascript": return ContentType.Javascript;
+                case "application/javascript": 
+                case "application/x-javascript":
+                case "text/javascript":
+                    return ContentType.Javascript;
                 case "text/css": return ContentType.Css;
-                case "text/jpeg": return ContentType.Image;
+                case "image/jpeg": 
+                case "image/png":
+                case "image/gif":
+                case "image/x-icon": 
+                    return ContentType.Image;
+                case "application/pdf": 
+                    return ContentType.Other;
                 default: throw new Exception($"Unknown media type {mediaType}");
             }
         }

@@ -1,4 +1,5 @@
 ﻿using ItsyBitsy.Data;
+using System.Net;
 using System.Net.Http;
 
 namespace ItsyBitsy.Domain
@@ -12,6 +13,7 @@ namespace ItsyBitsy.Domain
 
         public string Uri { get; }
         public string Status { get; internal set; }
+        public bool IsSuccessCode { get; internal set; }
         public string Content { get; internal set; }
         public HttpRequestException Exception { get; internal set; }
         public ContentType ContentType { get; internal set; }

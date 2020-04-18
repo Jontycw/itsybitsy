@@ -1,6 +1,7 @@
 ﻿using ItsyBitsy.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,14 +31,15 @@ namespace ItsyBitsy.Domain
 
         public async Task StartAsync()
         {
+            var seed = String.Intern(_website.Seed.ToString());
             while (_feeder.HasLinks())
             {
                 var nextLink = _feeder.GetNextLink();
                 var downloadResult = await _downloader.DownloadAsync(nextLink.Link);
                 var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink?.ParentId);
-                if (downloadResult.ContentType == ContentType.Html)
+                if (downloadResult.IsSuccessCode && downloadResult.ContentType == ContentType.Html)
                 {
-                    var newLinks = _processor.GetLinks(downloadResult.Content);
+                    var newLinks = _processor.GetLinks(downloadResult.Content).Where(x => x.StartsWith(seed));
                     _feeder.AddLinks(newLinks, pageId);
                 }
             }
