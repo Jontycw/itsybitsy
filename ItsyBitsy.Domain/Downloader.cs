@@ -90,6 +90,8 @@ namespace ItsyBitsy.Domain
                 case "image/svg+xml":
                 case "image/svg":
                     return ContentType.Image;
+                case "application/json":
+                    return ContentType.Json;
                 case "application/pdf": 
                     return ContentType.Other;
                 default: throw new Exception($"Unknown media type {mediaType}");

@@ -12,7 +12,8 @@ namespace ItsyBitsy.Data
         Css = 1,
         Javascript = 2,
         Image = 3,
-        Other = 4
+        Other = 4,
+        Json = 5
     }
 
     [Table("Page")]
