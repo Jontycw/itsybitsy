@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Entity;
-using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
 using System.Text;
 
@@ -11,13 +11,27 @@ namespace ItsyBitsy.Data
     public class ItsyBitsyDbContext : DbContext
     {
         public ItsyBitsyDbContext()
-            :base("ItsyBitsyDb")
         {
         }
 
-        protected override void OnModelCreating(DbModelBuilder dbModelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            dbModelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            if (!optionsBuilder.IsConfigured)
+                optionsBuilder.UseSqlServer("Server=.;Database=ItsyBitsyDb;Integrated Security=true");
+
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            var cascadeFKs = modelBuilder.Model.GetEntityTypes()
+                .SelectMany(t => t.GetForeignKeys())
+                .Where(fk => !fk.IsOwnership && fk.DeleteBehavior == DeleteBehavior.Cascade);
+
+            foreach (var fk in cascadeFKs)
+                fk.DeleteBehavior = DeleteBehavior.Restrict;
+
+            base.OnModelCreating(modelBuilder);
         }
 
         public DbSet<Session> Session { get; set; }

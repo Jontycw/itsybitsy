@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using ItsyBitsy.Data;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,36 +10,44 @@ namespace ItsyBitsy.Domain
 {
     public interface IProcessor
     {
-        IEnumerable<string> Process(string response);
-        Task<IEnumerable<string>> ProcessAsync(string response);
+        IEnumerable<string> GetLinks(string content);
+        Task<IEnumerable<string>> GetLinksAsync(string content);
     }
 
     public class Processor : IProcessor
     {
-        private readonly Uri _seed;
-        public Processor(Uri seed)
+        private readonly Website _website;
+        public Processor(Website website)
         {
-            _seed = seed;
+            _website = website;
         }
 
         /// <summary>
         /// Extracts data from an internet response.
         /// </summary>
         /// <param name="responseBody">internet response</param>
-        public IEnumerable<string> Process(string response)
+        public IEnumerable<string> GetLinks(string content)
         {
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(response);
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href]"))
+            doc.LoadHtml(content);
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
             {
                 HtmlAttribute att = link.Attributes["href"];
                 var pageLink = att.Value;
-                var absoluteUri = new Uri(_seed, pageLink).AbsoluteUri;
+                var absoluteUri = new Uri(_website.Seed, pageLink).AbsoluteUri;
+                yield return absoluteUri;
+            }
+
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src]"))
+            {
+                HtmlAttribute att = link.Attributes["src"];
+                var pageLink = att.Value;
+                var absoluteUri = new Uri(_website.Seed, pageLink).AbsoluteUri;
                 yield return absoluteUri;
             }
         }
 
-        public Task<IEnumerable<string>> ProcessAsync(string response)
+        public Task<IEnumerable<string>> GetLinksAsync(string content)
         {
             throw new NotImplementedException();
         }

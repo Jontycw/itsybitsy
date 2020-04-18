@@ -16,8 +16,10 @@ namespace ItsyBitsy.Data
 
         [Key]
         public int Id { get; set; }
-        public string Seed { get; set; }
 
+        [Required]
+        [MaxLength(2000)]
+        public string Seed { get; set; }
         public virtual ICollection<Page> Pages { get; set; }
     }
 }

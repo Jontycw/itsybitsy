@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using ItsyBitsy.Data;
 
 namespace ItsyBitsy.Domain
 {
     public interface IDownloader
     {
-        public Task<string> DownloadAsync(string uri);
+        public Task<DownloadResult> DownloadAsync(string uri);
         void Dispose();
     }
 
@@ -39,16 +42,45 @@ namespace ItsyBitsy.Domain
         /// </summary>
         /// <param name="uri">The url to download</param>
         /// <returns>html content</returns>
-        public async Task<string> DownloadAsync(string uri)
+        public async Task<DownloadResult> DownloadAsync(string uri)
         {
+            DownloadResult result = new DownloadResult(uri);
+
             try
             {
-                return await _client.GetStringAsync(uri);
+                var getResult = await _client.GetAsync(uri);
+                result.Status = getResult.StatusCode.ToString();
+
+                if(getResult.IsSuccessStatusCode)
+                {
+                    var resultContent = getResult.Content;
+                    Stopwatch watch = new Stopwatch();
+                    result.ContentType = GetContentType(resultContent.Headers.ContentType.MediaType);
+
+                    watch.Start();
+                    result.Content = await resultContent.ReadAsStringAsync();
+                    watch.Stop();
+                    result.DownloadTime = watch.ElapsedMilliseconds;
+                }
             }
             catch(HttpRequestException e)
             {
+                result.Exception = e;
                 Console.WriteLine($"ERROR: {uri}, {e.Message}");
-                return null;
+            }
+
+            return result;
+        }
+
+        private ContentType GetContentType(string mediaType)
+        {
+            switch(mediaType)
+            {
+                case "text/html": return ContentType.Html;
+                case "text/javascript": return ContentType.Javascript;
+                case "text/css": return ContentType.Css;
+                case "text/jpeg": return ContentType.Image;
+                default: throw new Exception($"Unknown media type {mediaType}");
             }
         }
 

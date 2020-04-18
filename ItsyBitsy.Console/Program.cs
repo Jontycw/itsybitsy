@@ -9,15 +9,58 @@ namespace ItsyBitsy.Crawler
     {
         static async Task Main(string[] args)
         {
-            var seedUrl = GetSeed(args);
+            //change to get website Id
+            var website = await GetWebsite(args);
+            var sesionId= await Repository.CreateNewSession();
 
             var feeder = new Feeder();
-            var downloader = new Downloader(seedUrl);
-            var processor = new Processor(seedUrl);
-            feeder.AddLink(seedUrl.ToString());
+            var downloader = new Downloader(website.Seed);
+            var processor = new Processor(website);
+            feeder.AddSeed(website.Seed.ToString());
 
-            var crawler = new Domain.Crawler(feeder, processor, downloader);
+            var crawler = new Domain.Crawler(feeder, processor, downloader, website, sesionId);
             await crawler.StartAsync();
+        }
+
+        private static async Task<Website> GetWebsite(string[] args)
+        {
+            if (args.Length == 1 && int.TryParse(args[0], out int websiteId))
+            {
+                var website = await Repository.GetDomainWebsite(websiteId);
+                if (website == null)
+                {
+                    return await GetWebsite(new string[0]);
+                }
+                else
+                {
+                    Console.WriteLine($"Starting crawl for {website.Seed}");
+                    return website;
+                }
+            }
+            else
+            {
+                string userWebsiteId;
+                int parsedWebsiteId;
+                do
+                {
+                    Console.Write("Please enter a website Id:");
+                    userWebsiteId = Console.ReadLine();
+                    Console.Clear();
+
+                }
+                while (!int.TryParse(userWebsiteId, out parsedWebsiteId));
+
+                var website = await Repository.GetDomainWebsite(parsedWebsiteId);
+                if (website == null)
+                {
+                    return await GetWebsite(new string[0]);
+                }
+                else
+                {
+                    Console.WriteLine($"Starting crawl for {website.Seed}");
+                    return website;
+                }
+            }
         }
 
         private static Uri GetSeed(string[] args)
@@ -32,7 +75,7 @@ namespace ItsyBitsy.Crawler
                 Uri parsedSeed;
                 do
                 {
-                    Console.Write("Please enger a seed:");
+                    Console.Write("Please enter a seed:");
                     userSeed = Console.ReadLine();
                     Console.Clear();
 

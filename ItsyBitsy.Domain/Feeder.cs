@@ -6,12 +6,36 @@ using System.Linq;
 
 namespace ItsyBitsy.Domain
 {
+    public class ParentLink
+    {
+        public ParentLink(string link, int? parentId)
+        {
+            Link = link;
+            ParentId = parentId;
+        }
+        public string Link { get; }
+        public int? ParentId { get; }
+
+        public override int GetHashCode()
+        {
+            return Link.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ParentLink res)
+                return res.Link == this.Link;
+
+            return false;
+        }
+    }
+
     public interface IFeeder
     {
         bool HasLinks();
-        string GetNextLink();
-        void AddLinks(IEnumerable<string> links);
-        void AddLink(string link);
+        ParentLink GetNextLink();
+        void AddLinks(IEnumerable<string> links, int? parentId);
+        void AddSeed(string link);
     }
 
     /// <summary>
@@ -20,13 +44,13 @@ namespace ItsyBitsy.Domain
     /// </summary>
     public class Feeder : IFeeder
     {
-        private readonly BlockingCollection<string> _processQueue;
-        private HashSet<string> _alreadyCrawled;
+        private readonly BlockingCollection<ParentLink> _processQueue;
+        private HashSet<ParentLink> _alreadyCrawled;
 
         public Feeder(int inMemorySize = 10000)
         {
-            _processQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), inMemorySize);
-            _alreadyCrawled = new HashSet<string>();
+            _processQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), inMemorySize);
+            _alreadyCrawled = new HashSet<ParentLink>();
         }
 
         /// <summary>
@@ -34,14 +58,15 @@ namespace ItsyBitsy.Domain
         /// If the queue is full, excess items should be saved to the ProcessQueue database table.
         /// </summary>
         /// <param name="links"></param>
-        public void AddLinks(IEnumerable<string> links)
+        public void AddLinks(IEnumerable<string> links, int? parentId)
         {
             foreach (var link in links)
             {
-                if (IsHttpUri(link) && _alreadyCrawled.Add(link))
+                var newItem = new ParentLink(link, parentId);
+                if (IsHttpUri(link) && _alreadyCrawled.Add(newItem))
                 {
                     Console.WriteLine(link);
-                    _processQueue.Add(link);
+                    _processQueue.Add(newItem);
                 }
             }
         }
@@ -56,9 +81,9 @@ namespace ItsyBitsy.Domain
                 (string.Compare("https", scheme, StringComparison.OrdinalIgnoreCase) == 0));
         }
 
-        public void AddLink(string link)
+        public void AddSeed(string link)
         {
-            _processQueue.Add(link);
+            _processQueue.Add(new ParentLink(link, null));
         }
 
         public void CompleteAdding()
@@ -71,7 +96,7 @@ namespace ItsyBitsy.Domain
             return _processQueue.Any();
         }
 
-        public string GetNextLink()
+        public ParentLink GetNextLink()
         {
             return _processQueue.Take();
         }

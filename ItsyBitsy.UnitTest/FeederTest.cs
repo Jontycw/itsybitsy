@@ -8,19 +8,19 @@ namespace ItsyBitsy.UnitTest
 {
     public class FeederTest
     {
-        private static List<string> StringList1 = new List<string>() { "5" };
-        private static List<string> StringList4 = new List<string>() { "1", "2", "3", "4" };
+        private static List<string> StringList1 = new List<string>() { "http://5" };
+        private static List<string> StringList4 = new List<string>() { "http://1", "http://2", "http://3", "http://4" };
 
         [Fact]
         public void DontReprocessTheSameLink()
         {
             var feeder = new Feeder(10);
-            feeder.AddLinks(StringList4);
-            Assert.Equal("1", feeder.GetNextLink());
-            Assert.Equal("2", feeder.GetNextLink());
-            feeder.AddLinks(StringList4);
-            Assert.Equal("3", feeder.GetNextLink());
-            Assert.Equal("4", feeder.GetNextLink());
+            feeder.AddLinks(StringList4, null);
+            Assert.Equal("http://1", feeder.GetNextLink().Link);
+            Assert.Equal("http://2", feeder.GetNextLink().Link);
+            feeder.AddLinks(StringList4, null);
+            Assert.Equal("http://3", feeder.GetNextLink().Link);
+            Assert.Equal("http://4", feeder.GetNextLink().Link);
             Assert.False(feeder.HasLinks());
         }
 
@@ -28,13 +28,13 @@ namespace ItsyBitsy.UnitTest
         public void KeeplinksInOrder()
         {
             var feeder = new Feeder(10);
-            feeder.AddLinks(StringList4);
-            Assert.Equal("1", feeder.GetNextLink());
-            Assert.Equal("2", feeder.GetNextLink());
-            feeder.AddLinks(StringList1);
-            Assert.Equal("3", feeder.GetNextLink());
-            Assert.Equal("4", feeder.GetNextLink());
-            Assert.Equal("5", feeder.GetNextLink());
+            feeder.AddLinks(StringList4, null);
+            Assert.Equal("http://1", feeder.GetNextLink().Link);
+            Assert.Equal("http://2", feeder.GetNextLink().Link);
+            feeder.AddLinks(StringList1, null);
+            Assert.Equal("http://3", feeder.GetNextLink().Link);
+            Assert.Equal("http://4", feeder.GetNextLink().Link);
+            Assert.Equal("http://5", feeder.GetNextLink().Link);
             Assert.False(feeder.HasLinks());
         }
 
@@ -43,7 +43,7 @@ namespace ItsyBitsy.UnitTest
         {
             var feeder = new Feeder(10);
             Assert.False(feeder.HasLinks());
-            feeder.AddLinks(StringList1);
+            feeder.AddLinks(StringList1, null);
             Assert.True(feeder.HasLinks());
             feeder.GetNextLink();
             Assert.False(feeder.HasLinks());

@@ -6,7 +6,7 @@ namespace ItsyBitsy.UnitTest
 {
     public static class MockHtml
     {
-        public static string Has5Links = @"<!doctype html>
+        public static string Has7Links = @"<!doctype html>
             <html lang=""en"">
             <head>
               <meta charset=""utf-8"">

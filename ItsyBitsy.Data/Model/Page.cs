@@ -6,16 +6,35 @@ using System.Text;
 
 namespace ItsyBitsy.Data
 {
+    public enum ContentType : byte
+    {
+        Html = 0,
+        Css = 1,
+        Javascript = 2,
+        Image = 3
+    }
+
+    [Table("Page")]
     public class Page
     {
+        public Page()
+        {
+            if (TimeStamp == default)
+                TimeStamp = DateTime.Now;
+        }
+
         [Key]
         public int Id { get; set; }
 
+        [Required]
         [DataType(DataType.Url)]
         public string Uri { get; set; }
 
+        [Required]
         [MaxLength(3)]
         public string StatusCode { get; set; }
+
+        public ContentType ContentType { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime TimeStamp { get; set; }
@@ -33,6 +52,9 @@ namespace ItsyBitsy.Data
         public virtual Page ParentPage { get; set; }
 
         [ForeignKey("ParentPage")]
-        public int ParentPageId { get; set; }
+        public int? ParentPageId { get; set; }
+
+        [DataType(DataType.Duration)]
+        public long DownloadTime { get; set; }
     }
 }

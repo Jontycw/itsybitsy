@@ -8,4 +8,8 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ItsyBitsy.Data\ItsyBitsy.Data.csproj" />
+  </ItemGroup>
+
 </Project>
