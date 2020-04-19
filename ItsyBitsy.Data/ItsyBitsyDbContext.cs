@@ -31,6 +31,9 @@ namespace ItsyBitsy.Data
             foreach (var fk in cascadeFKs)
                 fk.DeleteBehavior = DeleteBehavior.Restrict;
 
+            modelBuilder.Entity<PageRelation>()
+                .HasKey(o => new { o.ParentPageId, o.ChildPageId });
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -38,5 +41,6 @@ namespace ItsyBitsy.Data
         public DbSet<Website> Website { get; set; }
         public DbSet<Page> Page { get; set; }
         public DbSet<ProcessQueue> ProcessQueue { get; set; }
+        public DbSet<PageRelation> PageRelation { get; set; }
     }
 }

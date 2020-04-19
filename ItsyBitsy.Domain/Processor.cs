@@ -42,21 +42,32 @@ namespace ItsyBitsy.Domain
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(content);
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
-            {
-                HtmlAttribute att = link.Attributes["href"];
-                var pageLink = att.Value;
-                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri))
-                    yield return new PageLink(absoluteUri.ToString(), link.Name == "link");
-            }
 
             foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src] | //img[@src]"))
             {
                 HtmlAttribute att = link.Attributes["src"];
                 var pageLink = att.Value;
-                var absoluteUri = new Uri(_website.Seed, pageLink).AbsoluteUri;
-                yield return new PageLink(absoluteUri.ToString(), true);
+                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                    yield return new PageLink(absoluteUri.AbsoluteUri, true);
             }
+
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
+            {
+                HtmlAttribute att = link.Attributes["href"];
+                var pageLink = att.Value;
+                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                    yield return new PageLink(absoluteUri.AbsoluteUri, link.Name == "link");
+            }
+        }
+
+        internal static bool IsHttpUri(string uri)
+        {
+            if (uri == null)
+                return false;
+
+            string scheme = new Uri(uri).Scheme;
+            return ((string.Compare("http", scheme, StringComparison.OrdinalIgnoreCase) == 0) ||
+                (string.Compare("https", scheme, StringComparison.OrdinalIgnoreCase) == 0));
         }
 
         public Task<IEnumerable<string>> GetLinksAsync(string content)

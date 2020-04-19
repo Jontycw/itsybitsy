@@ -29,7 +29,7 @@ namespace ItsyBitsy.Data
         public int Id { get; set; }
 
         [Required]
-        [DataType(DataType.Url)]
+        [MaxLength(4000), DataType(DataType.Url)]
         public string Uri { get; set; }
 
         [Required]
@@ -50,11 +50,6 @@ namespace ItsyBitsy.Data
 
         [ForeignKey("Session")]
         public int SessionId { get; set; }
-
-        public virtual Page ParentPage { get; set; }
-
-        [ForeignKey("ParentPage")]
-        public int? ParentPageId { get; set; }
 
         [DataType(DataType.Duration)]
         public long DownloadTime { get; set; }

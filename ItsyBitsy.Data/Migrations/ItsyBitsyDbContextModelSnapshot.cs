@@ -32,9 +32,6 @@ namespace ItsyBitsy.Data.Migrations
                     b.Property<long>("DownloadTime")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("ParentPageId")
-                        .HasColumnType("int");
-
                     b.Property<int>("SessionId")
                         .HasColumnType("int");
 
@@ -48,20 +45,34 @@ namespace ItsyBitsy.Data.Migrations
 
                     b.Property<string>("Uri")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(4000);
 
                     b.Property<int>("WebsiteId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentPageId");
-
                     b.HasIndex("SessionId");
 
                     b.HasIndex("WebsiteId");
 
                     b.ToTable("Page");
+                });
+
+            modelBuilder.Entity("ItsyBitsy.Data.PageRelation", b =>
+                {
+                    b.Property<int>("ParentPageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ChildPageId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ParentPageId", "ChildPageId");
+
+                    b.HasIndex("ChildPageId");
+
+                    b.ToTable("PageRelation");
                 });
 
             modelBuilder.Entity("ItsyBitsy.Data.ProcessQueue", b =>
@@ -130,10 +141,6 @@ namespace ItsyBitsy.Data.Migrations
 
             modelBuilder.Entity("ItsyBitsy.Data.Page", b =>
                 {
-                    b.HasOne("ItsyBitsy.Data.Page", "ParentPage")
-                        .WithMany()
-                        .HasForeignKey("ParentPageId");
-
                     b.HasOne("ItsyBitsy.Data.Session", "Session")
                         .WithMany("Pages")
                         .HasForeignKey("SessionId")
@@ -143,6 +150,21 @@ namespace ItsyBitsy.Data.Migrations
                     b.HasOne("ItsyBitsy.Data.Website", "Website")
                         .WithMany("Pages")
                         .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ItsyBitsy.Data.PageRelation", b =>
+                {
+                    b.HasOne("ItsyBitsy.Data.Page", "ChildPage")
+                        .WithMany()
+                        .HasForeignKey("ChildPageId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ItsyBitsy.Data.Page", "ParentPage")
+                        .WithMany()
+                        .HasForeignKey("ParentPageId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

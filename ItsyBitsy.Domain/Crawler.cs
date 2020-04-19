@@ -36,13 +36,15 @@ namespace ItsyBitsy.Domain
             {
                 var nextLink = _feeder.GetNextLink();
                 var downloadResult = await _downloader.DownloadAsync(nextLink.Link);
-                var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink?.ParentId);
+                var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink.ParentId);
+
                 if (downloadResult.IsSuccessCode && downloadResult.ContentType == ContentType.Html)
                 {
                     var newLinks = _processor.GetLinks(downloadResult.Content)
                         .Where(x => x.IsContent || x.Link.StartsWith(seed))
                         .Select(x => x.Link);
-                    _feeder.AddLinks(newLinks, pageId);
+
+                    await _feeder.AddLinks(newLinks, pageId);
                 }
             }
         }

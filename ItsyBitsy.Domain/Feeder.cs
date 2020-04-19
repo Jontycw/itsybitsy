@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
 {
@@ -34,7 +35,7 @@ namespace ItsyBitsy.Domain
     {
         bool HasLinks();
         ParentLink GetNextLink();
-        void AddLinks(IEnumerable<string> links, int? parentId);
+        Task AddLinks(IEnumerable<string> links, int parentId);
         void AddSeed(string link);
     }
 
@@ -58,27 +59,24 @@ namespace ItsyBitsy.Domain
         /// If the queue is full, excess items should be saved to the ProcessQueue database table.
         /// </summary>
         /// <param name="links"></param>
-        public void AddLinks(IEnumerable<string> links, int? parentId)
+        public async Task AddLinks(IEnumerable<string> links, int parentId)
         {
+            HashSet<string> existingLinks = new HashSet<string>();
             foreach (var link in links)
             {
                 var newItem = new ParentLink(link, parentId);
-                if (IsHttpUri(link) && _alreadyCrawled.Add(newItem))
+                if (_alreadyCrawled.Add(newItem))
                 {
                     Console.WriteLine(link);
                     _processQueue.Add(newItem);
                 }
+                else
+                {
+                    existingLinks.Add(link);
+                }
             }
-        }
 
-        internal static bool IsHttpUri(string uri)
-        {
-            if (uri == null)
-                return false;
-
-            string scheme = new Uri(uri).Scheme;
-            return ((string.Compare("http", scheme, StringComparison.OrdinalIgnoreCase) == 0) ||
-                (string.Compare("https", scheme, StringComparison.OrdinalIgnoreCase) == 0));
+            await Repository.AddPageRelation(existingLinks, parentId);
         }
 
         public void AddSeed(string link)

@@ -1,8 +1,7 @@
-﻿select pageO.*, crossRes.DownloadMs + pageO.DownloadTime [All Content DownloadTime]
-from [Page] pageO 
-	cross apply 
-		(select SUM(pageI.DownloadTime) DownloadMs, ParentPageId
-		from [Page] pageI
-		where ParentPageId = PageO.Id and ContentType <> 0
-		group by ParentPageId) crossRes
-where WebsiteId = 1
+﻿select crossPAge.DlTime + outerp.DownloadTime [All Resource], outerp.*
+from [Page] outerp
+	outer apply(
+		select sum(childPage.DownloadTime) [DlTime]
+		from [Page] childPage inner join PageRelation pr on childPage.Id = pr.ChildPageId
+		where pr.ParentPageId = outerp.Id and childPage.ContentType <> 4) crossPage
+where SessionId = 2 and crossPage.DlTime is not null

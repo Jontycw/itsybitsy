@@ -1,7 +1,7 @@
 ﻿using ItsyBitsy.Data;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
@@ -13,7 +13,6 @@ namespace ItsyBitsy.Domain
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
             var newPage = new Page()
             {
-                ParentPageId = parentId,
                 SessionId = sessionId,
                 StatusCode = response.Status,
                 WebsiteId = websiteId,
@@ -22,6 +21,17 @@ namespace ItsyBitsy.Domain
                 DownloadTime = response.DownloadTime
             };
             context.Page.Add(newPage);
+
+            if (parentId.HasValue)
+            {
+                var newPageRelation = new PageRelation()
+                {
+                    ParentPageId = parentId.Value,
+                    ChildPage = newPage,
+                };
+                context.PageRelation.Add(newPageRelation);
+            }
+
             await context.SaveChangesAsync();
             return newPage.Id;
         }
@@ -58,6 +68,17 @@ namespace ItsyBitsy.Domain
                 return new Website(dbWebsite);
 
             return null;
+        }
+
+        internal static async Task AddPageRelation(IEnumerable<string> existingLinks, int parentId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            var pageRelations = from page in context.Page
+                                where existingLinks.Contains(page.Uri)
+                                select new PageRelation() { ChildPageId = page.Id, ParentPageId = parentId };
+
+            context.PageRelation.AddRange(pageRelations);
+            await context.SaveChangesAsync();
         }
     }
 }

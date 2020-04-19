@@ -40,24 +40,17 @@ namespace ItsyBitsy.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Uri = table.Column<string>(nullable: false),
+                    Uri = table.Column<string>(maxLength: 4000, nullable: false),
                     StatusCode = table.Column<string>(maxLength: 3, nullable: false),
                     ContentType = table.Column<byte>(nullable: false),
                     TimeStamp = table.Column<DateTime>(nullable: false),
                     WebsiteId = table.Column<int>(nullable: false),
                     SessionId = table.Column<int>(nullable: false),
-                    ParentPageId = table.Column<int>(nullable: true),
                     DownloadTime = table.Column<long>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Page", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Page_Page_ParentPageId",
-                        column: x => x.ParentPageId,
-                        principalTable: "Page",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Page_Session_SessionId",
                         column: x => x.SessionId,
@@ -100,10 +93,29 @@ namespace ItsyBitsy.Data.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Page_ParentPageId",
-                table: "Page",
-                column: "ParentPageId");
+            migrationBuilder.CreateTable(
+                name: "PageRelation",
+                columns: table => new
+                {
+                    ParentPageId = table.Column<int>(nullable: false),
+                    ChildPageId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PageRelation", x => new { x.ParentPageId, x.ChildPageId });
+                    table.ForeignKey(
+                        name: "FK_PageRelation_Page_ChildPageId",
+                        column: x => x.ChildPageId,
+                        principalTable: "Page",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_PageRelation_Page_ParentPageId",
+                        column: x => x.ParentPageId,
+                        principalTable: "Page",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Page_SessionId",
@@ -114,6 +126,11 @@ namespace ItsyBitsy.Data.Migrations
                 name: "IX_Page_WebsiteId",
                 table: "Page",
                 column: "WebsiteId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PageRelation_ChildPageId",
+                table: "PageRelation",
+                column: "ChildPageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProcessQueue_SessionId",
@@ -129,10 +146,13 @@ namespace ItsyBitsy.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Page");
+                name: "PageRelation");
 
             migrationBuilder.DropTable(
                 name: "ProcessQueue");
+
+            migrationBuilder.DropTable(
+                name: "Page");
 
             migrationBuilder.DropTable(
                 name: "Session");
