@@ -68,7 +68,7 @@ namespace ItsyBitsy.Domain
                 if (_alreadyCrawled.Add(newItem))
                 {
                     Console.WriteLine(link);
-                    _processQueue.Add(newItem);
+                    _processQueue.Add(newItem);// move overflow to database
                 }
                 else
                 {
@@ -81,7 +81,9 @@ namespace ItsyBitsy.Domain
 
         public void AddSeed(string link)
         {
-            _processQueue.Add(new ParentLink(link, null));
+            var parentLink = new ParentLink(link, null);
+            _alreadyCrawled.Add(parentLink);
+            _processQueue.Add(parentLink);
         }
 
         public void CompleteAdding()

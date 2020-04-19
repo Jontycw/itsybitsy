@@ -30,11 +30,12 @@ namespace ItsyBitsy.Domain
                 AutomaticDecompression = System.Net.DecompressionMethods.All,
                 CookieContainer = new System.Net.CookieContainer(),
                 MaxConnectionsPerServer = 15,
-                UseCookies = false
+                UseCookies = false,
             };
 
             _client = new HttpClient(handler);
             _client.BaseAddress = host;
+            //_client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36");
         }
 
         /// <summary>
@@ -58,7 +59,7 @@ namespace ItsyBitsy.Domain
                 {
                     result.IsSuccessCode = true;
                     var resultContent = getResult.Content;
-                    result.ContentType = GetContentType(resultContent.Headers.ContentType.MediaType);
+                    result.ContentType = GetContentType(resultContent.Headers.ContentType?.MediaType);
 
                     result.Content = await resultContent.ReadAsStringAsync();
                     result.DownloadTime = watch.ElapsedMilliseconds;
@@ -75,6 +76,9 @@ namespace ItsyBitsy.Domain
 
         private ContentType GetContentType(string mediaType)
         {
+            if (string.IsNullOrWhiteSpace(mediaType))
+                return ContentType.Other;
+
             switch(mediaType)
             {
                 case "text/html": return ContentType.Html;
@@ -89,10 +93,13 @@ namespace ItsyBitsy.Domain
                 case "image/x-icon":
                 case "image/svg+xml":
                 case "image/svg":
+                case "image/vnd.microsoft.icon":
                     return ContentType.Image;
                 case "application/json":
                     return ContentType.Json;
                 case "application/pdf": 
+                case "text/xml":
+                case "application/font-woff":
                     return ContentType.Other;
                 default: throw new Exception($"Unknown media type {mediaType}");
             }

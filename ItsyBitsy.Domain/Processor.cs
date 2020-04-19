@@ -43,6 +43,14 @@ namespace ItsyBitsy.Domain
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(content);
 
+            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
+            {
+                HtmlAttribute att = link.Attributes["href"];
+                var pageLink = att.Value;
+                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                    yield return new PageLink(absoluteUri.AbsoluteUri, link.Name == "link");
+            }
+
             foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src] | //img[@src]"))
             {
                 HtmlAttribute att = link.Attributes["src"];
@@ -51,13 +59,6 @@ namespace ItsyBitsy.Domain
                     yield return new PageLink(absoluteUri.AbsoluteUri, true);
             }
 
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
-            {
-                HtmlAttribute att = link.Attributes["href"];
-                var pageLink = att.Value;
-                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
-                    yield return new PageLink(absoluteUri.AbsoluteUri, link.Name == "link");
-            }
         }
 
         internal static bool IsHttpUri(string uri)
