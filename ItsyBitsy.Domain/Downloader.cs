@@ -52,7 +52,7 @@ namespace ItsyBitsy.Domain
                 watch.Start();
                 var getResult = await _client.GetAsync(uri);
                 watch.Stop();
-                result.Status = ((byte)getResult.StatusCode).ToString();
+                result.Status = ((int)getResult.StatusCode).ToString();
 
                 if (getResult.IsSuccessStatusCode)
                 {
