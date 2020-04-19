@@ -19,8 +19,8 @@ namespace ItsyBitsy.Data
         public int Id { get; set; }
 
         [Required]
-        [DataType(DataType.Url)]
-        public Uri Link { get; set; }
+        [MaxLength(4000), DataType(DataType.Url)]
+        public string Link { get; set; }
 
         [Required]
         [DataType(DataType.DateTime)]
@@ -33,5 +33,6 @@ namespace ItsyBitsy.Data
         [ForeignKey("Website")]
         public int WebsiteId { get; set; }
         public virtual Website Website { get; set; }
+        public int ParentId { get; set; }
     }
 }

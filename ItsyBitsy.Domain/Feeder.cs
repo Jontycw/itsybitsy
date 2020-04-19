@@ -35,7 +35,7 @@ namespace ItsyBitsy.Domain
     {
         bool HasLinks();
         ParentLink GetNextLink();
-        Task AddLinks(IEnumerable<string> links, int parentId);
+        Task AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId);
         void AddSeed(string link);
     }
 
@@ -48,7 +48,7 @@ namespace ItsyBitsy.Domain
         private readonly BlockingCollection<ParentLink> _processQueue;
         private HashSet<ParentLink> _alreadyCrawled;
 
-        public Feeder(int inMemorySize = 10000)
+        public Feeder(int inMemorySize = 1000)
         {
             _processQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), inMemorySize);
             _alreadyCrawled = new HashSet<ParentLink>();
@@ -59,7 +59,7 @@ namespace ItsyBitsy.Domain
         /// If the queue is full, excess items should be saved to the ProcessQueue database table.
         /// </summary>
         /// <param name="links"></param>
-        public async Task AddLinks(IEnumerable<string> links, int parentId)
+        public async Task AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId)
         {
             HashSet<string> existingLinks = new HashSet<string>();
             foreach (var link in links)
@@ -68,7 +68,10 @@ namespace ItsyBitsy.Domain
                 if (_alreadyCrawled.Add(newItem))
                 {
                     Console.WriteLine(link);
-                    _processQueue.Add(newItem);// move overflow to database
+                    if (!_processQueue.TryAdd(newItem, 100))
+                    {
+                        await Repository.AddToProcessQueue(newItem, sessionId, websiteId);
+                    }
                 }
                 else
                 {
@@ -76,7 +79,25 @@ namespace ItsyBitsy.Domain
                 }
             }
 
+            if (_processQueue.Count < 500)
+                await PopulateFromDatabase(sessionId, websiteId);
+
             await Repository.AddPageRelation(existingLinks, parentId);
+        }
+
+        private async Task PopulateFromDatabase(int sessionId, int websiteId)
+        {
+            List<Data.ProcessQueue> successfullyQueued = new List<Data.ProcessQueue>();
+            var queueItems = Repository.GetProcessQueueItems(sessionId, websiteId);
+            foreach (var queueItem in queueItems)
+            {
+                if (!_processQueue.TryAdd(new ParentLink(queueItem.Link, queueItem.ParentId), 50))
+                    break;
+                else
+                    successfullyQueued.Add(queueItem);
+            }
+
+            await Repository.RemoveQueuedItems(successfullyQueued);
         }
 
         public void AddSeed(string link)

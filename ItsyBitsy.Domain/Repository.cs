@@ -70,6 +70,39 @@ namespace ItsyBitsy.Domain
             return null;
         }
 
+        internal static async Task AddToProcessQueue(ParentLink newItem, int sessionId, int websiteId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            context.ProcessQueue.Add(new ProcessQueue()
+            {
+                Link = newItem.Link,
+                ParentId = newItem.ParentId.Value,
+                SessionId = sessionId,
+                WebsiteId = websiteId,
+            });
+
+            await context.SaveChangesAsync();
+        }
+
+        internal static IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            var nextQueueItems = (from queueItem in context.ProcessQueue
+                                  where queueItem.SessionId == sessionId && queueItem.WebsiteId == websiteId
+                                  orderby queueItem.TimeStamp
+                                  select queueItem)
+                                 .Take(400);
+
+            return nextQueueItems.ToList();
+        }
+
+        internal static async Task RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            context.ProcessQueue.RemoveRange(successfullyQueued);
+            await context.SaveChangesAsync();
+        }
+
         internal static async Task AddPageRelation(IEnumerable<string> existingLinks, int parentId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();

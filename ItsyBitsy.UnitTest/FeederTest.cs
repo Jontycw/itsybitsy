@@ -16,10 +16,10 @@ namespace ItsyBitsy.UnitTest
         public async Task DontReprocessTheSameLink()
         {
             var feeder = new Feeder(10);
-            await feeder.AddLinks(StringList4, 100);
+            await feeder.AddLinks(StringList4, 100, 100, 100);
             Assert.Equal("http://1", feeder.GetNextLink().Link);
             Assert.Equal("http://2", feeder.GetNextLink().Link);
-            await feeder.AddLinks(StringList4, 100);
+            await feeder.AddLinks(StringList4, 100, 100, 100);
             Assert.Equal("http://3", feeder.GetNextLink().Link);
             Assert.Equal("http://4", feeder.GetNextLink().Link);
             Assert.False(feeder.HasLinks());
@@ -29,10 +29,10 @@ namespace ItsyBitsy.UnitTest
         public async Task KeeplinksInOrder()
         {
             var feeder = new Feeder(10);
-            await feeder.AddLinks(StringList4, 100);
+            await feeder.AddLinks(StringList4, 100, 100, 100);
             Assert.Equal("http://1", feeder.GetNextLink().Link);
             Assert.Equal("http://2", feeder.GetNextLink().Link);
-            await feeder.AddLinks(StringList1, 100);
+            await feeder.AddLinks(StringList1, 100, 100, 100);
             Assert.Equal("http://3", feeder.GetNextLink().Link);
             Assert.Equal("http://4", feeder.GetNextLink().Link);
             Assert.Equal("http://5", feeder.GetNextLink().Link);
@@ -44,7 +44,7 @@ namespace ItsyBitsy.UnitTest
         {
             var feeder = new Feeder(10);
             Assert.False(feeder.HasLinks());
-            await feeder.AddLinks(StringList1, 100);
+            await feeder.AddLinks(StringList1, 100, 100, 100);
             Assert.True(feeder.HasLinks());
             feeder.GetNextLink();
             Assert.False(feeder.HasLinks());

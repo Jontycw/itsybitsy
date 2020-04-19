@@ -71,10 +71,11 @@ namespace ItsyBitsy.Data.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Link = table.Column<string>(nullable: false),
+                    Link = table.Column<string>(maxLength: 4000, nullable: false),
                     TimeStamp = table.Column<DateTime>(nullable: false),
                     SessionId = table.Column<int>(nullable: false),
-                    WebsiteId = table.Column<int>(nullable: false)
+                    WebsiteId = table.Column<int>(nullable: false),
+                    ParentId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

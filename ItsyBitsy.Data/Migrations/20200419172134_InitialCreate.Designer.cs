@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ItsyBitsy.Data.Migrations
 {
     [DbContext(typeof(ItsyBitsyDbContext))]
-    [Migration("20200419123750_InitialCreate")]
+    [Migration("20200419172134_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -86,7 +86,11 @@ namespace ItsyBitsy.Data.Migrations
 
                     b.Property<string>("Link")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(4000);
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SessionId")
                         .HasColumnType("int");

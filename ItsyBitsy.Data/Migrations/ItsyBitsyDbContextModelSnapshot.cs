@@ -84,7 +84,11 @@ namespace ItsyBitsy.Data.Migrations
 
                     b.Property<string>("Link")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(4000);
+
+                    b.Property<int>("ParentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("SessionId")
                         .HasColumnType("int");

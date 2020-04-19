@@ -44,7 +44,7 @@ namespace ItsyBitsy.Domain
                         .Where(x => x.IsContent || x.Link.StartsWith(seed))
                         .Select(x => x.Link);
 
-                    await _feeder.AddLinks(newLinks, pageId);
+                    await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
                 }
             }
         }
