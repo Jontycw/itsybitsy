@@ -64,28 +64,5 @@ namespace ItsyBitsy.Crawler
                 }
             }
         }
-
-        private static Uri GetSeed(string[] args)
-        {
-            if (args.Length == 1 && Uri.TryCreate(args[0], UriKind.Absolute, out Uri seed))
-            {
-                return seed;
-            }
-            else
-            {
-                string userSeed;
-                Uri parsedSeed;
-                do
-                {
-                    Console.Write("Please enter a seed:");
-                    userSeed = Console.ReadLine();
-                    Console.Clear();
-
-                }
-                while (!Uri.TryCreate(userSeed, UriKind.Absolute, out parsedSeed));
-                Console.WriteLine($"Starting crawl for {userSeed}");
-                return parsedSeed;
-            }
-        }
     }
 }
