@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ItsyBitsy.Data", "ItsyBitsy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ItsyBitsy.Domain", "ItsyBitsy.Domain\ItsyBitsy.Domain.csproj", "{6AD5B0B9-E171-4FC9-AE83-EBC550F86108}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItsyBitsy.UnitTest", "ItsyBitsy.UnitTest\ItsyBitsy.UnitTest.csproj", "{216FE336-BFEE-499F-8857-82C61B5042C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ItsyBitsy.UnitTest", "ItsyBitsy.UnitTest\ItsyBitsy.UnitTest.csproj", "{216FE336-BFEE-499F-8857-82C61B5042C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ItsyBitsy.UI", "ItsyBitsy.UI\ItsyBitsy.UI.csproj", "{7B556B4D-7772-466F-83E2-85EC6EF37CEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{216FE336-BFEE-499F-8857-82C61B5042C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{216FE336-BFEE-499F-8857-82C61B5042C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{216FE336-BFEE-499F-8857-82C61B5042C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B556B4D-7772-466F-83E2-85EC6EF37CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B556B4D-7772-466F-83E2-85EC6EF37CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B556B4D-7772-466F-83E2-85EC6EF37CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B556B4D-7772-466F-83E2-85EC6EF37CEB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

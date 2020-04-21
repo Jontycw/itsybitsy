@@ -1,0 +1,29 @@
+﻿<Window x:Class="ItsyBitsy.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ItsyBitsy.UI"
+        mc:Ignorable="d"
+        Title="ItsyBitsy" Height="800" Width="1280">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Crawl">
+                <WrapPanel>
+                    <GroupBox Margin="5">
+                        <GroupBox.Header>Content Type</GroupBox.Header>
+                        <WrapPanel>
+                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentImage">Image</CheckBox>
+                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentCss">CSS</CheckBox>
+                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentJs">JS</CheckBox>
+                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentPdf">PDF</CheckBox>
+                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentHtml">HTML</CheckBox>
+                        </WrapPanel>
+                    </GroupBox>
+                </WrapPanel>
+            </TabItem>
+            <TabItem Header="Security" />
+            <TabItem Header="Details" />
+        </TabControl>
+    </Grid>
+</Window>
