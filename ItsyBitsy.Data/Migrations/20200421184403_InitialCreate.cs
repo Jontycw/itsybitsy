@@ -46,7 +46,8 @@ namespace ItsyBitsy.Data.Migrations
                     TimeStamp = table.Column<DateTime>(nullable: false),
                     WebsiteId = table.Column<int>(nullable: false),
                     SessionId = table.Column<int>(nullable: false),
-                    DownloadTime = table.Column<long>(nullable: false)
+                    DownloadTime = table.Column<long>(nullable: false),
+                    ContentLength = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

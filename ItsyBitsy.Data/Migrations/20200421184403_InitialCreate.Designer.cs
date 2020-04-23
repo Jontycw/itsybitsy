@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ItsyBitsy.Data.Migrations
 {
     [DbContext(typeof(ItsyBitsyDbContext))]
-    [Migration("20200419172134_InitialCreate")]
+    [Migration("20200421184403_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,6 +27,9 @@ namespace ItsyBitsy.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ContentLength")
+                        .HasColumnType("int");
 
                     b.Property<byte>("ContentType")
                         .HasColumnType("tinyint");

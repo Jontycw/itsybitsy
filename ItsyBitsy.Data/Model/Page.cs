@@ -53,5 +53,6 @@ namespace ItsyBitsy.Data
 
         [DataType(DataType.Duration)]
         public long DownloadTime { get; set; }
+        public int ContentLength { get; set; }
     }
 }

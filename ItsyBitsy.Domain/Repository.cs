@@ -18,7 +18,8 @@ namespace ItsyBitsy.Domain
                 WebsiteId = websiteId,
                 Uri = response.Uri,
                 ContentType = response.ContentType,
-                DownloadTime = response.DownloadTime
+                DownloadTime = response.DownloadTime,
+                ContentLength = response.ContentLengthBytes
             };
             context.Page.Add(newPage);
 

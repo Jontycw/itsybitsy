@@ -8,21 +8,61 @@
         Title="ItsyBitsy" Height="800" Width="1280">
     <Grid>
         <TabControl>
-            <TabItem Header="Crawl">
-                <WrapPanel>
-                    <GroupBox Margin="5">
-                        <GroupBox.Header>Content Type</GroupBox.Header>
-                        <WrapPanel>
-                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentImage">Image</CheckBox>
-                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentCss">CSS</CheckBox>
-                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentJs">JS</CheckBox>
-                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentPdf">PDF</CheckBox>
-                            <CheckBox HorizontalAlignment="Left" Margin="10" Name="contentHtml">HTML</CheckBox>
-                        </WrapPanel>
-                    </GroupBox>
-                </WrapPanel>
+            <TabItem Header="Setup Crawl">
+                <StackPanel Margin="5">
+                    <WrapPanel Margin="5">
+                        <Label>Website</Label>
+                        <ComboBox Name="selectedWebsite" Width="200"></ComboBox>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>Include Content Types</GroupBox.Header>
+                            <WrapPanel>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentImage">Image</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentCss">CSS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJs">JS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJson">JSON</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentOther">Other</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentHtml">HTML</CheckBox>
+                            </WrapPanel>
+                        </GroupBox>
+                        <GroupBox Margin="5">
+                            <GroupBox.Header>Crawl Options</GroupBox.Header>
+                            <WrapPanel>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="False" Margin="10" Name="optionExternalLink">Follow External Links</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionExternalContent">Download External Content</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionAllowRedirects">Follow Redirects</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
+                            </WrapPanel>
+                        </GroupBox>
+                    </WrapPanel>
+                    <WrapPanel>
+                        <Button Margin="10" Padding="15,5">Start</Button>
+                        <Button Margin="10" Padding="15,5">Pause</Button>
+                        <Button Margin="10" Padding="15,5">Drain Stop</Button>
+                        <Button Margin="10" Padding="15,5">Hard Stop</Button>
+                    </WrapPanel>
+                    <ProgressBar Height="20" Margin="5" x:Name="crawlProgressBar" />
+                    <Label Name="crawlProgressLabel" HorizontalAlignment="Right"></Label>
+                    <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress"/>
+                </StackPanel>
             </TabItem>
-            <TabItem Header="Security" />
+            <TabItem Header="Websites">
+                <StackPanel Margin="5">
+                    <WrapPanel Margin="5">
+                        <Label Margin="5,0">Website Name</Label>
+                        <TextBox Width="150" Padding="0,3" x:Name="websiteName"></TextBox>
+                        <Label Margin="5,0">Website Seed</Label>
+                        <TextBox Width="150" Padding="0,3" x:Name="websiteSeed"></TextBox>
+                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite">Add Website</Button>
+                        <Label Margin="5" Name="AddWebsiteStatus"></Label>
+                    </WrapPanel>
+                    <DockPanel>
+                        <DataGrid DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Name="websitesGrid"/>
+                    </DockPanel>
+                </StackPanel>
+            </TabItem>
             <TabItem Header="Details" />
         </TabControl>
     </Grid>

@@ -26,6 +26,9 @@ namespace ItsyBitsy.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ContentLength")
+                        .HasColumnType("int");
+
                     b.Property<byte>("ContentType")
                         .HasColumnType("tinyint");
 

@@ -18,5 +18,6 @@ namespace ItsyBitsy.Domain
         public HttpRequestException Exception { get; internal set; }
         public ContentType ContentType { get; internal set; }
         public long DownloadTime { get; internal set; }
+        public int ContentLengthBytes { get; internal set; }
     }
 }
