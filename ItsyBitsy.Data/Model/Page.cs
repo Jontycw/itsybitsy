@@ -6,16 +6,6 @@ using System.Text;
 
 namespace ItsyBitsy.Data
 {
-    public enum ContentType : byte
-    {
-        Html = 0,
-        Css = 1,
-        Javascript = 2,
-        Image = 3,
-        Other = 4,
-        Json = 5
-    }
-
     [Table("Page")]
     public class Page
     {
@@ -36,7 +26,7 @@ namespace ItsyBitsy.Data
         [MaxLength(3)]
         public string StatusCode { get; set; }
 
-        public ContentType ContentType { get; set; }
+        public byte ContentType { get; set; }
 
         [DataType(DataType.DateTime)]
         public DateTime TimeStamp { get; set; }

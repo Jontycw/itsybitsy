@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ItsyBitsy.UI"
-        mc:Ignorable="d"
         Title="ItsyBitsy" Height="800" Width="1280">
     <Grid>
         <TabControl>
@@ -18,21 +17,20 @@
                         <GroupBox Margin="5">
                             <GroupBox.Header>Include Content Types</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentImage">Image</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentCss">CSS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeCss, Mode=TwoWay}" Margin="10">CSS</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJs">JS</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJson">JSON</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentOther">Other</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentHtml">HTML</CheckBox>
                             </WrapPanel>
                         </GroupBox>
                         <GroupBox Margin="5">
                             <GroupBox.Header>Crawl Options</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="False" Margin="10" Name="optionExternalLink">Follow External Links</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionExternalContent">Download External Content</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding FollowExtenalLinks, Mode=TwoWay}" Margin="10">Follow External Links</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding DownloadExternalContent, Mode=TwoWay}" Margin="10">Download External Content</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionAllowRedirects">Follow Redirects</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionFollowRedirects">Follow Redirects</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
                             </WrapPanel>
                         </GroupBox>

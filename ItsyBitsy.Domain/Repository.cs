@@ -17,7 +17,7 @@ namespace ItsyBitsy.Domain
                 StatusCode = response.Status,
                 WebsiteId = websiteId,
                 Uri = response.Uri,
-                ContentType = response.ContentType,
+                ContentType = (byte)response.ContentType,
                 DownloadTime = response.DownloadTime,
                 ContentLength = response.ContentLengthBytes
             };
