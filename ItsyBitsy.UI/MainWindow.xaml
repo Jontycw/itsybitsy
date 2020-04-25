@@ -5,6 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ItsyBitsy.UI"
         Title="ItsyBitsy" Height="800" Width="1280">
+    <Window.DataContext>
+        <local:Settings/>
+    </Window.DataContext>
     <Grid>
         <TabControl>
             <TabItem Header="Setup Crawl">
@@ -17,21 +20,21 @@
                         <GroupBox Margin="5">
                             <GroupBox.Header>Include Content Types</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeCss, Mode=TwoWay}" Margin="10">CSS</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJs">JS</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentJson">JSON</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="contentOther">Other</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeCss, Mode=TwoWay}" Margin="10">CSS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeJs, Mode=TwoWay}" Margin="10" Name="contentJs">JS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeJson, Mode=TwoWay}" Margin="10" Name="contentJson">JSON</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeOther, Mode=TwoWay}" Margin="10" Name="contentOther">Other</CheckBox>
                             </WrapPanel>
                         </GroupBox>
                         <GroupBox Margin="5">
                             <GroupBox.Header>Crawl Options</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding FollowExtenalLinks, Mode=TwoWay}" Margin="10">Follow External Links</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding DownloadExternalContent, Mode=TwoWay}" Margin="10">Download External Content</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionFollowRedirects">Follow Redirects</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="True" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10">Follow External Links</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10">Download External Content</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects">Follow Redirects</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.UseCookies, Mode=TwoWay}" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
                             </WrapPanel>
                         </GroupBox>
                     </WrapPanel>
