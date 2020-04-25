@@ -23,9 +23,7 @@ namespace ItsyBitsy.UI
     {
         public MainWindow()
         {
-            _ = Settings.Instance;
             InitializeComponent();
-            //DataContext = Settings.Instance;
         }
     }
 }
