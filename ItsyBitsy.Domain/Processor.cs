@@ -10,7 +10,7 @@ namespace ItsyBitsy.Domain
 {
     public interface IProcessor
     {
-        IEnumerable<PageLink> GetLinks(string content);
+        IEnumerable<PageLink> GetLinks(Uri seed, string content);
         Task<IEnumerable<string>> GetLinksAsync(string content);
     }
 
@@ -28,37 +28,30 @@ namespace ItsyBitsy.Domain
 
     public class Processor : IProcessor
     {
-        private readonly Website _website;
-        public Processor(Website website)
-        {
-            _website = website;
-        }
-
         /// <summary>
         /// Extracts data from an internet response.
         /// </summary>
         /// <param name="responseBody">internet response</param>
-        public IEnumerable<PageLink> GetLinks(string content)
+        public IEnumerable<PageLink> GetLinks(Uri seed, string content)
         {
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(content);
-
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//a[@href] | //link[@href]"))
+            var docNode = doc.DocumentNode;
+            foreach (HtmlNode link in docNode?.SelectNodes("//a[@href] | //link[@href]"))
             {
                 HtmlAttribute att = link.Attributes["href"];
                 var pageLink = att.Value;
-                if(Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                if (Uri.TryCreate(seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     yield return new PageLink(absoluteUri.AbsoluteUri, link.Name == "link");
             }
 
-            foreach (HtmlNode link in doc.DocumentNode.SelectNodes("//script[@src] | //img[@src]"))
+            foreach (HtmlNode link in docNode?.SelectNodes("//script[@src] | //img[@src]"))
             {
                 HtmlAttribute att = link.Attributes["src"];
                 var pageLink = att.Value;
-                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                if (Uri.TryCreate(seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     yield return new PageLink(absoluteUri.AbsoluteUri, true);
             }
-
         }
 
         internal static bool IsHttpUri(string uri)

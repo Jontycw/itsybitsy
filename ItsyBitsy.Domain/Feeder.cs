@@ -35,7 +35,7 @@ namespace ItsyBitsy.Domain
     {
         bool HasLinks();
         ParentLink GetNextLink();
-        Task AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId);
+        Task<int> AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId);
         void AddSeed(string link);
     }
 
@@ -59,19 +59,20 @@ namespace ItsyBitsy.Domain
         /// If the queue is full, excess items should be saved to the ProcessQueue database table.
         /// </summary>
         /// <param name="links"></param>
-        public async Task AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId)
+        public async Task<int> AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId)
         {
             HashSet<string> existingLinks = new HashSet<string>();
+            int linksAddedToQueue = 0;
             foreach (var link in links)
             {
                 var newItem = new ParentLink(link, parentId);
                 if (_alreadyCrawled.Add(newItem))
                 {
-                    Console.WriteLine(link);
                     if (!_processQueue.TryAdd(newItem, 100))
                     {
                         await Repository.AddToProcessQueue(newItem, sessionId, websiteId);
                     }
+                    linksAddedToQueue++;
                 }
                 else
                 {
@@ -80,12 +81,14 @@ namespace ItsyBitsy.Domain
             }
 
             if (_processQueue.Count < 500)
-                await PopulateFromDatabase(sessionId, websiteId);
+                await PopulateQueueFromDatabase(sessionId, websiteId);
 
             await Repository.AddPageRelation(existingLinks, parentId);
+
+            return linksAddedToQueue;
         }
 
-        private async Task PopulateFromDatabase(int sessionId, int websiteId)
+        private async Task PopulateQueueFromDatabase(int sessionId, int websiteId)
         {
             List<Data.ProcessQueue> successfullyQueued = new List<Data.ProcessQueue>();
             var queueItems = Repository.GetProcessQueueItems(sessionId, websiteId);

@@ -63,7 +63,7 @@ namespace ItsyBitsy.Domain
 
                     var bytes = await resultContent.ReadAsByteArrayAsync();
                     result.ContentLengthBytes = bytes.Length;
-                    result.Content = BitConverter.ToString(bytes);
+                    result.Content = Encoding.ASCII.GetString(bytes);
                     result.DownloadTime = watch.ElapsedMilliseconds;
                     result.Redirectedto = getResult.RequestMessage.RequestUri.AbsoluteUri;
                 }

@@ -9,17 +9,20 @@
         <TabControl>
             <TabItem Header="Setup Crawl">
                 <StackPanel Margin="5">
-                    <WrapPanel Margin="5">
+                    <WrapPanel Margin="5" Name="pnlWebsites">
                         <WrapPanel.DataContext>
                             <Binding Source="{x:Static local:CrawlContext.Instance}" />
                         </WrapPanel.DataContext>
-                        <Label>Website</Label>
+                        <Label>Websites</Label>
                         <ComboBox Name="selectedWebsite" Width="200"
                                   ItemsSource="{Binding Path=WebsiteSeeds}" 
                                   SelectedItem="{Binding Path=SelectedWebsite}"
                                   SelectedValue="{Binding Path=SelectedWebsite.Id}"></ComboBox>
+                        <TextBox Width="250" Padding="0,3" Margin="15,0,0,0" x:Name="websiteSeed" Text="https://"></TextBox>
+                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add</Button>
+                        <Label Margin="5" Name="AddWebsiteStatus"></Label>
                     </WrapPanel>
-                    <WrapPanel>
+                    <WrapPanel Name="pnlSettings">
                         <WrapPanel.DataContext>
                             <Binding Source="{x:Static local:Settings.Instance}" />
                         </WrapPanel.DataContext>
@@ -51,25 +54,14 @@
                         <Button Margin="10" Padding="15,5" Name="btnDrainStop" Click="BtnDrainStop_Click">Drain Stop</Button>
                         <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click">Hard Stop</Button>
                     </WrapPanel>
-                    <ProgressBar Height="20" Margin="5" x:Name="crawlProgressBar" />
-                    <Label Name="crawlProgressLabel" HorizontalAlignment="Right"></Label>
-                    <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress"/>
+                    <StackPanel>
+                        <ProgressBar Height="20" Margin="5" Value="{Binding Progress.TotalCrawled, Mode=OneWay}" Maximum="{Binding Progress.TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
+                        <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding Progress.StatusText, Mode=OneWay}"></Label>
+                        <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress"/>
+                    </StackPanel>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Websites">
-                <StackPanel Margin="5">
-                    <WrapPanel Margin="5">
-                        <Label Margin="5,0">Website Seed</Label>
-                        <TextBox Width="150" Padding="0,3" x:Name="websiteSeed"></TextBox>
-                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add</Button>
-                        <Label Margin="5" Name="AddWebsiteStatus"></Label>
-                    </WrapPanel>
-                    <DockPanel>
-                        <DataGrid DockPanel.Dock="Bottom" VerticalAlignment="Bottom" Name="websitesGrid"/>
-                    </DockPanel>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="Details" />
+            <TabItem Header="Past Sessions" />
         </TabControl>
     </Grid>
 </Window>

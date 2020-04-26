@@ -23,18 +23,34 @@ namespace ItsyBitsy.UI
     public partial class MainWindow : Window
     {
         readonly CrawlManager _crawlManager;
+        public CrawlProgressReport Progress => _crawlManager.CrawlProgressReport;
 
         public MainWindow()
         {
             _crawlManager = new CrawlManager();
             InitializeComponent();
+            DataContext = this;
+            //Progress = _crawlManager.CrawlProgressReport;
         }
+
+        //private void CrawlManager_OnProgress(object sender, CrawlManager.ProgressEventArgs e)
+        //{
+        //    var progress = e.Progress;
+        //    crawlProgressBar.Maximum = progress.TotalInQueue;
+        //    crawlProgressBar.Value = progress.TotalCrawled;
+        //    PropertyChanged(this, new PropertyChangedEventArgs("crawlProgressBar"));
+        //    crawlProgressLabel.Content = $"{(progress.TotalCrawled / progress.TotalInQueue * 100):0.##} Errors:{progress.TotalSuccess - progress.TotalCrawled}";
+        //    PropertyChanged(this, new PropertyChangedEventArgs("crawlProgressLabel"));
+        //}
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             if (selectedWebsite.SelectedItem is Website website)
             {
-                btnStart.IsEnabled = false; //enable on crawl onComplete event
+                //re-enable ui components on crawl complete event.
+                btnStart.IsEnabled = false; 
+                pnlSettings.IsEnabled = false;
+                pnlWebsites.IsEnabled = false;
                 await _crawlManager.Start(website);
             }
         }

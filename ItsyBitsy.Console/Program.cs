@@ -15,11 +15,11 @@ namespace ItsyBitsy.Crawler
 
             var feeder = new Feeder();
             var downloader = new Downloader(website.Seed);
-            var processor = new Processor(website);
+            var processor = new Processor();
             feeder.AddSeed(website.Seed.ToString());
 
-            var crawler = new Domain.Crawler(feeder, processor, downloader, website, sessionId);
-            await crawler.StartAsync();
+            var crawler = new Domain.Crawler(feeder, processor);
+            await crawler.StartAsync(website, sessionId);
             await Repository.EndSession(sessionId);
             Console.WriteLine("Crawl Finished.");
         }
