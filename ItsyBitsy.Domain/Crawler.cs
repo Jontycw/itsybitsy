@@ -22,14 +22,14 @@ namespace ItsyBitsy.Domain
         private int _sessionId;
         private readonly CancellationTokenSource _tokenSource;
         private bool _addNewLinks = true;
-        private PauseTokenSource _pauseToken;
+        private readonly PauseTokenSource _pauseToken;
 
         public CrawlProgressReport CrawlProgressReport { get; } = new CrawlProgressReport();
 
-        public Crawler(IFeeder feeder, IProcessor processor)
+        public Crawler()
         {
-            _feeder = feeder;
-            _processor = processor;
+            _feeder = new Feeder();
+            _processor = new Processor();
             _tokenSource = new CancellationTokenSource();
             _pauseToken = new PauseTokenSource();
         }
@@ -42,21 +42,27 @@ namespace ItsyBitsy.Domain
 
             var seed = String.Intern(_website.Seed.ToString());
             var token = _tokenSource.Token;
+
+            _feeder.AddSeed(seed);
+            CrawlProgressReport.TotalInQueue++;
+
             while (!token.IsCancellationRequested && _feeder.HasLinks())
             {
                 var nextLink = _feeder.GetNextLink();
                 var downloadResult = await _downloader.DownloadAsync(nextLink.Link);
                 var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink.ParentId);
 
-                if (_addNewLinks && downloadResult.IsSuccessCode && downloadResult.ContentType == ContentType.Html)
+                if (downloadResult.IsSuccessCode)
                 {
                     CrawlProgressReport.TotalSuccess++;
+                    if (_addNewLinks && downloadResult.ContentType == ContentType.Html)
+                    {
+                        var newLinks = _processor.GetLinks(website.Seed, downloadResult.Content)
+                            .Where(x => x.IsContent || x.Link.StartsWith(seed))
+                            .Select(x => x.Link);
 
-                    var newLinks = _processor.GetLinks(website.Seed, downloadResult.Content)
-                        .Where(x => x.IsContent || x.Link.StartsWith(seed))
-                        .Select(x => x.Link);
-
-                    CrawlProgressReport.TotalInQueue += await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
+                        CrawlProgressReport.TotalInQueue += await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
+                    }
                 }
 
                 CrawlProgressReport.Add(downloadResult.ContentType);

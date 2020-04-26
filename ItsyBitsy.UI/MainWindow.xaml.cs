@@ -30,18 +30,7 @@ namespace ItsyBitsy.UI
             _crawlManager = new CrawlManager();
             InitializeComponent();
             DataContext = this;
-            //Progress = _crawlManager.CrawlProgressReport;
         }
-
-        //private void CrawlManager_OnProgress(object sender, CrawlManager.ProgressEventArgs e)
-        //{
-        //    var progress = e.Progress;
-        //    crawlProgressBar.Maximum = progress.TotalInQueue;
-        //    crawlProgressBar.Value = progress.TotalCrawled;
-        //    PropertyChanged(this, new PropertyChangedEventArgs("crawlProgressBar"));
-        //    crawlProgressLabel.Content = $"{(progress.TotalCrawled / progress.TotalInQueue * 100):0.##} Errors:{progress.TotalSuccess - progress.TotalCrawled}";
-        //    PropertyChanged(this, new PropertyChangedEventArgs("crawlProgressLabel"));
-        //}
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {

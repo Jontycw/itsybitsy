@@ -11,7 +11,7 @@ namespace ItsyBitsy.Domain
         public int TotalInQueue { get; set; }
         public int TotalCrawled => ContentTypeDistribution.Values.Sum();
         public int TotalSuccess { get; internal set; }
-        public string StatusText => TotalInQueue > 0 ? $"{(TotalCrawled / TotalInQueue * 100):0.##} Errors:{TotalSuccess - TotalCrawled}" : string.Empty;
+        public string StatusText => TotalInQueue > 0 ? $"{TotalCrawled}/{TotalInQueue} {((TotalCrawled * 1.0) / TotalInQueue * 100.0):0.##}% Errors:{TotalCrawled - TotalSuccess}" : string.Empty;
 
         public void Add(ContentType contentType)
         {

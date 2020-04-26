@@ -36,5 +36,7 @@ namespace ItsyBitsy.UI
         public ObservableCollection<Website> WebsiteSeeds { get; set; }
         public Website SelectedWebsite { get; set; }
         public Settings Settings { get; set; }
+
+        //add report here
     }
 }
