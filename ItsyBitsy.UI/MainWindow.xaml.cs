@@ -64,11 +64,13 @@ namespace ItsyBitsy.UI
             var seed = websiteSeed.Text;
             try
             {
-                await Repository.CreateWebsite(seed);
+                var newWebsite = await Repository.CreateWebsite(seed);
+                CrawlContext.Instance.WebsiteSeeds.Add(newWebsite);
+                MessageBox.Show($"{seed} was added successfully.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error adding website", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }

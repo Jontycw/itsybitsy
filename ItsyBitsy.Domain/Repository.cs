@@ -67,12 +67,12 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
-        public static async Task CreateWebsite(string seed)
+        public static async Task<Website> CreateWebsite(string seed)
         {
             if (!Uri.TryCreate(seed, UriKind.Absolute, out Uri uri))
                 throw new InvalidCastException($"{seed} is not a valid uri.");
 
-            if (uri.Scheme != "http" || uri.Scheme != "https")
+            if (uri.Scheme != "http" && uri.Scheme != "https")
                 throw new Exception("Only http and https are accepted.");
 
             var host = new Uri($"{uri.Scheme}://{uri.Host}");
@@ -87,14 +87,11 @@ namespace ItsyBitsy.Domain
             if (context.Website.Any(x => x.Seed == websiteHomeUri))
                 throw new InvalidCastException($"{websiteHomeUri} already exists.");
 
-
-            var dbWebsite = context.Website
-                .Add(new Data.Website()
-                {
-                    Seed = seed
-                });
-
+            var dbWebsite = new Data.Website() { Seed = seed };
+            context.Website.Add(dbWebsite);
             await context.SaveChangesAsync();
+
+            return new Website(dbWebsite);
         }
 
         public static async Task<Website> GetDomainWebsite(int websiteId)
