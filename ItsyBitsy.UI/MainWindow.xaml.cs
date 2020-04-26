@@ -32,8 +32,11 @@ namespace ItsyBitsy.UI
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-            btnStart.IsEnabled = false; //enable on crawl onComplete event
-            await _crawlManager.Start();
+            if (selectedWebsite.SelectedItem is Website website)
+            {
+                btnStart.IsEnabled = false; //enable on crawl onComplete event
+                await _crawlManager.Start(website);
+            }
         }
 
         private async void BtnHardStop_Click(object sender, RoutedEventArgs e)

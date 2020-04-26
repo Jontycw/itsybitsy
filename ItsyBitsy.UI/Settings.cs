@@ -28,6 +28,8 @@ namespace ItsyBitsy.UI
             }
         }
 
+        private Settings() { }
+
         public void Save()
         {
             var settingJson = JsonSerializer.Serialize(this);

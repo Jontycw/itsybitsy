@@ -9,9 +9,8 @@ namespace ItsyBitsy.Domain
     {
         private Crawler _crawler;
 
-        public async Task Start()
+        public async Task Start(Website website)
         {
-            var website = new Website(null);
             var feeder = new Feeder();
             var downloader = new Downloader(website.Seed);
             var processor = new Processor(website);

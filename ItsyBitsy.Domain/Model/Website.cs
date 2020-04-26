@@ -17,5 +17,10 @@ namespace ItsyBitsy.Domain
 
         public int Id { get; }
         public Uri Seed { get; }
+
+        public override string ToString()
+        {
+            return Seed.ToString();
+        }
     }
 }

@@ -37,6 +37,12 @@ namespace ItsyBitsy.Domain
             return newPage.Id;
         }
 
+        public static List<Website> GetWebsites()
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            return context.Website.Select(x => new Website(x)).ToList();
+        }
+
         public static async Task EndSession(int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();

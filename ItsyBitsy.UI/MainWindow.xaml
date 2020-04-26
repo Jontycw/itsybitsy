@@ -5,23 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ItsyBitsy.UI"
         Title="ItsyBitsy" Height="800" Width="1280">
-    <Window.DataContext>
-        <local:Settings/>
-    </Window.DataContext>
     <Grid>
         <TabControl>
             <TabItem Header="Setup Crawl">
                 <StackPanel Margin="5">
                     <WrapPanel Margin="5">
+                        <WrapPanel.DataContext>
+                            <Binding Source="{x:Static local:CrawlContext.Instance}" />
+                        </WrapPanel.DataContext>
                         <Label>Website</Label>
-                        <ComboBox Name="selectedWebsite" Width="200"></ComboBox>
+                        <ComboBox Name="selectedWebsite" Width="200"
+                                  ItemsSource="{Binding Path=WebsiteSeeds}" 
+                                  SelectedItem="{Binding Path=SelectedWebsite}"
+                                  SelectedValue="{Binding Path=SelectedWebsite.Id}"></ComboBox>
                     </WrapPanel>
                     <WrapPanel>
+                        <WrapPanel.DataContext>
+                            <Binding Source="{x:Static local:Settings.Instance}" />
+                        </WrapPanel.DataContext>
                         <GroupBox Margin="5">
                             <GroupBox.Header>Include Content Types</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeCss, Mode=TwoWay}" Margin="10">CSS</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeCss, Mode=TwoWay}" Margin="10">CSS</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeJs, Mode=TwoWay}" Margin="10" Name="contentJs">JS</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeJson, Mode=TwoWay}" Margin="10" Name="contentJson">JSON</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeOther, Mode=TwoWay}" Margin="10" Name="contentOther">Other</CheckBox>
