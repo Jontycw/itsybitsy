@@ -39,10 +39,11 @@
                         </GroupBox>
                     </WrapPanel>
                     <WrapPanel>
-                        <Button Margin="10" Padding="15,5">Start</Button>
-                        <Button Margin="10" Padding="15,5">Pause</Button>
-                        <Button Margin="10" Padding="15,5">Drain Stop</Button>
-                        <Button Margin="10" Padding="15,5">Hard Stop</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click">Pause</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click">Resume</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnDrainStop" Click="BtnDrainStop_Click">Drain Stop</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click">Hard Stop</Button>
                     </WrapPanel>
                     <ProgressBar Height="20" Margin="5" x:Name="crawlProgressBar" />
                     <Label Name="crawlProgressLabel" HorizontalAlignment="Right"></Label>
@@ -52,11 +53,9 @@
             <TabItem Header="Websites">
                 <StackPanel Margin="5">
                     <WrapPanel Margin="5">
-                        <Label Margin="5,0">Website Name</Label>
-                        <TextBox Width="150" Padding="0,3" x:Name="websiteName"></TextBox>
                         <Label Margin="5,0">Website Seed</Label>
                         <TextBox Width="150" Padding="0,3" x:Name="websiteSeed"></TextBox>
-                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite">Add Website</Button>
+                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add</Button>
                         <Label Margin="5" Name="AddWebsiteStatus"></Label>
                     </WrapPanel>
                     <DockPanel>

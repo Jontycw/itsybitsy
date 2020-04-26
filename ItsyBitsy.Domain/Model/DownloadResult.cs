@@ -19,5 +19,6 @@ namespace ItsyBitsy.Domain
         public ContentType ContentType { get; internal set; }
         public long DownloadTime { get; internal set; }
         public int ContentLengthBytes { get; internal set; }
+        public string Redirectedto { get; internal set; }
     }
 }

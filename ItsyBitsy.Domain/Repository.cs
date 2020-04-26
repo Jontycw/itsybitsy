@@ -61,6 +61,36 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
+        public static async Task CreateWebsite(string seed)
+        {
+            if (!Uri.TryCreate(seed, UriKind.Absolute, out Uri uri))
+                throw new InvalidCastException($"{seed} is not a valid uri.");
+
+            if (uri.Scheme != "http" || uri.Scheme != "https")
+                throw new Exception("Only http and https are accepted.");
+
+            var host = new Uri($"{uri.Scheme}://{uri.Host}");
+            using var downloader = new Downloader(host);
+            var downloadResult = await downloader.DownloadAsync(string.Empty);
+            var websiteHomeUri = downloadResult.Redirectedto;
+
+            if(seed != websiteHomeUri)
+                throw new Exception($"{seed} redirects to {websiteHomeUri} please use this as the seed.");
+
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            if (context.Website.Any(x => x.Seed == websiteHomeUri))
+                throw new InvalidCastException($"{websiteHomeUri} already exists.");
+
+
+            var dbWebsite = context.Website
+                .Add(new Data.Website()
+                {
+                    Seed = seed
+                });
+
+            await context.SaveChangesAsync();
+        }
+
         public static async Task<Website> GetDomainWebsite(int websiteId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();

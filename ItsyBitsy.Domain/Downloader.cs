@@ -65,6 +65,7 @@ namespace ItsyBitsy.Domain
                     result.ContentLengthBytes = bytes.Length;
                     result.Content = BitConverter.ToString(bytes);
                     result.DownloadTime = watch.ElapsedMilliseconds;
+                    result.Redirectedto = getResult.RequestMessage.RequestUri.AbsoluteUri;
                 }
             }
             catch (HttpRequestException e)
