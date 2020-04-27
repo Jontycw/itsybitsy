@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -16,6 +17,7 @@ namespace ItsyBitsy.Domain
         void Dispose();
     }
 
+
     public class Downloader : IDownloader, IDisposable
     {
         private bool disposed = false;
@@ -23,12 +25,13 @@ namespace ItsyBitsy.Domain
 
         public Downloader(Uri host, ISettings settings = null)
         {
+            ServicePointManager.DefaultConnectionLimit = 50;
             HttpClientHandler handler = new HttpClientHandler()
             {
                 AllowAutoRedirect = settings?.FollowRedirects ?? true,
                 MaxAutomaticRedirections = 10,
-                AutomaticDecompression = System.Net.DecompressionMethods.All,
-                CookieContainer = new System.Net.CookieContainer(),
+                AutomaticDecompression = DecompressionMethods.All,
+                CookieContainer = new CookieContainer(),
                 MaxConnectionsPerServer = 15,
                 UseCookies = settings?.UseCookies ?? false,
             };
@@ -105,6 +108,7 @@ namespace ItsyBitsy.Domain
                 case "application/pdf": 
                 case "text/xml":
                 case "application/font-woff":
+                case "application/zip":
                     return ContentType.Other;
                 default: throw new Exception($"Unknown media type {mediaType}");
             }

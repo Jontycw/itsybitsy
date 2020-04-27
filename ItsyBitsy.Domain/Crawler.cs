@@ -92,6 +92,7 @@ namespace ItsyBitsy.Domain
 
                 downloadResult.Content = string.Empty;//already processed
                 _progress.Add(downloadResult);
+
                 await _pauseToken.PauseIfRequestedAsync(token);
             }
         }

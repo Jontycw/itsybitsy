@@ -104,17 +104,10 @@ namespace ItsyBitsy.Domain
             return null;
         }
 
-        internal static async Task AddToProcessQueue(ParentLink newItem, int sessionId, int websiteId)
+        internal static async Task AddToProcessQueue(IEnumerable<ProcessQueue> queueItems)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            context.ProcessQueue.Add(new ProcessQueue()
-            {
-                Link = newItem.Link,
-                ParentId = newItem.ParentId.Value,
-                SessionId = sessionId,
-                WebsiteId = websiteId,
-            });
-
+            context.ProcessQueue.AddRange(queueItems);
             await context.SaveChangesAsync();
         }
 

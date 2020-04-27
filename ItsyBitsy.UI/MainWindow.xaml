@@ -60,7 +60,7 @@
                         <ProgressBar Height="20" Margin="5" Value="{Binding TotalCrawled, Mode=OneWay}" Maximum="{Binding TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
                         <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
                         <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress" 
-                                        ItemsSource="{Binding RecentResults}" 
+                                        ItemsSource="{Binding RecentResults, Mode=OneWay}"
                                         AutoGenerateColumns="False"
                                         VerticalScrollBarVisibility="Visible"
                                         AlternatingRowBackground="AntiqueWhite"

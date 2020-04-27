@@ -25,10 +25,10 @@ namespace ItsyBitsy.UI
         public void Add(DownloadResult downloadResult)
         {
             RecentResults.Insert(0, downloadResult);
-            if (RecentResults.Count == 100)
-                RecentResults.RemoveAt(99);
-
+            if (RecentResults.Count == 50)
+                RecentResults.RemoveAt(49);
             ContentTypeDistribution[downloadResult.ContentType]++;
+
             NotifyPropertyChanged("TotalInQueue");
             NotifyPropertyChanged("TotalCrawled");
             NotifyPropertyChanged("Statustext");

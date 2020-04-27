@@ -118,6 +118,9 @@ namespace ItsyBitsy.Domain
         {
             Task resumeRequestTask = null;
 
+            if (token.IsCancellationRequested)
+                return;
+
             await _pauseRequestAsyncLock.WaitAsync(token);
             try
             {

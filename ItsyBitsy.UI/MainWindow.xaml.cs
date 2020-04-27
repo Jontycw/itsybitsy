@@ -44,6 +44,9 @@ namespace ItsyBitsy.UI
         private async void BtnHardStop_Click(object sender, RoutedEventArgs e)
         {
             await _crawlManager.HardStop();
+            btnStart.IsEnabled = true;
+            pnlSettings.IsEnabled = true;
+            pnlWebsites.IsEnabled = true;
         }
 
         private async void BtnPause_Click(object sender, RoutedEventArgs e)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
+using ItsyBitsy.Data;
 
 namespace ItsyBitsy.Domain
 {
@@ -61,36 +62,62 @@ namespace ItsyBitsy.Domain
         /// <param name="links"></param>
         public async Task<int> AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId)
         {
-            HashSet<string> existingLinks = new HashSet<string>();
-            int linksAddedToQueue = 0;
-            foreach (var link in links)
+            return await Task.Run(async () =>
             {
-                var newItem = new ParentLink(link, parentId);
-                if (_alreadyCrawled.Add(newItem))
+                bool isHalfempty = _processQueue.Count < 500;
+                HashSet<string> existingLinks = new HashSet<string>();
+                List<ProcessQueue> overflowProcessQueueItems = new List<ProcessQueue>();
+
+                int linksAddedToQueue = 0;
+                foreach (var link in links)
                 {
-                    if (!_processQueue.TryAdd(newItem, 100))
+                    var newItem = new ParentLink(link, parentId);
+                    if (_alreadyCrawled.Add(newItem))
                     {
-                        await Repository.AddToProcessQueue(newItem, sessionId, websiteId);
+                        if (isHalfempty)
+                        {
+                            overflowProcessQueueItems.Add(new ProcessQueue()
+                            {
+                                Link = newItem.Link,
+                                ParentId = newItem.ParentId.Value,
+                                SessionId = sessionId,
+                                WebsiteId = websiteId,
+                            });
+                        }
+                        else if(!_processQueue.TryAdd(newItem, 10))
+                        {
+                            overflowProcessQueueItems.Add(new ProcessQueue()
+                            {
+                                Link = newItem.Link,
+                                ParentId = newItem.ParentId.Value,
+                                SessionId = sessionId,
+                                WebsiteId = websiteId,
+                            });
+                        }
+
+                        linksAddedToQueue++;
                     }
-                    linksAddedToQueue++;
+                    else
+                    {
+                        existingLinks.Add(link);
+                    }
                 }
-                else
-                {
-                    existingLinks.Add(link);
-                }
-            }
 
-            if (_processQueue.Count < 500)
-                await PopulateQueueFromDatabase(sessionId, websiteId);
+                if(overflowProcessQueueItems.Any())
+                    await Repository.AddToProcessQueue(overflowProcessQueueItems);
 
-            await Repository.AddPageRelation(existingLinks, parentId);
+                if (_processQueue.Count < 500)
+                    await PopulateQueueFromDatabase(sessionId, websiteId);
 
-            return linksAddedToQueue;
+                await Repository.AddPageRelation(existingLinks, parentId);
+
+                return linksAddedToQueue;
+            });
         }
 
         private async Task PopulateQueueFromDatabase(int sessionId, int websiteId)
         {
-            List<Data.ProcessQueue> successfullyQueued = new List<Data.ProcessQueue>();
+            List<ProcessQueue> successfullyQueued = new List<ProcessQueue>();
             var queueItems = Repository.GetProcessQueueItems(sessionId, websiteId);
             foreach (var queueItem in queueItems)
             {
