@@ -10,7 +10,7 @@ namespace ItsyBitsy.UI
 
         public CrawlManager()
         {
-            _crawler = new Crawler(CrawlProgress.Instance);
+            _crawler = new Crawler(CrawlProgress.Instance, Settings.Instance);
         }
 
         public async Task Start(Website website)

@@ -28,6 +28,12 @@ namespace ItsyBitsy.Domain
 
     public class Processor : IProcessor
     {
+        private readonly ISettings _settings;
+        public Processor(ISettings settings)
+        {
+            _settings = settings;
+        }
+
         /// <summary>
         /// Extracts data from an internet response.
         /// </summary>
@@ -37,6 +43,7 @@ namespace ItsyBitsy.Domain
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(content);
             var docNode = doc.DocumentNode;
+
             foreach (HtmlNode link in docNode?.SelectNodes("//a[@href] | //link[@href]"))
             {
                 HtmlAttribute att = link.Attributes["href"];

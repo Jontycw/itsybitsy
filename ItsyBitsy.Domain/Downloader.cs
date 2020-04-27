@@ -21,21 +21,21 @@ namespace ItsyBitsy.Domain
         private bool disposed = false;
         private readonly HttpClient _client;
 
-        public Downloader(Uri host)
+        public Downloader(Uri host, ISettings settings = null)
         {
             HttpClientHandler handler = new HttpClientHandler()
             {
-                AllowAutoRedirect = true,
+                AllowAutoRedirect = settings?.FollowRedirects ?? true,
                 MaxAutomaticRedirections = 10,
                 AutomaticDecompression = System.Net.DecompressionMethods.All,
                 CookieContainer = new System.Net.CookieContainer(),
                 MaxConnectionsPerServer = 15,
-                UseCookies = false,
+                UseCookies = settings?.UseCookies ?? false,
             };
 
             _client = new HttpClient(handler);
             _client.BaseAddress = host;
-            //_client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36");
+            _client.DefaultRequestHeaders.TryAddWithoutValidation("User-Agent", "ItsyBitsy");
         }
 
         /// <summary>
@@ -84,7 +84,9 @@ namespace ItsyBitsy.Domain
 
             switch(mediaType)
             {
-                case "text/html": return ContentType.Html;
+                case "text/html":
+                case "application/xhtml+xml":
+                    return ContentType.Html;
                 case "application/javascript": 
                 case "application/x-javascript":
                 case "text/javascript":

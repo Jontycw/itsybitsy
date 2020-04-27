@@ -1,6 +1,7 @@
 ﻿using ItsyBitsy.Domain;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -10,16 +11,24 @@ namespace ItsyBitsy.UI
     {
         private static readonly Lazy<CrawlProgress> lazy = new Lazy<CrawlProgress>(new CrawlProgress());
         public static CrawlProgress Instance { get { return lazy.Value; } }
-        private CrawlProgress() { }
+        private CrawlProgress() 
+        {
+            RecentResults = new ObservableCollection<DownloadResult>();
+        }
 
         public int TotalInQueue { get; set; }
         public int TotalCrawled => ContentTypeDistribution.Values.Sum();
         public int TotalSuccess { get; set; }
         public string StatusText => TotalInQueue > 0 ? $"{TotalCrawled}/{TotalInQueue} {((TotalCrawled * 1.0) / TotalInQueue * 100.0):0.##}% Errors:{TotalCrawled - TotalSuccess}" : string.Empty;
+        public ObservableCollection<DownloadResult> RecentResults { get; }
 
-        public void Add(ContentType contentType)
+        public void Add(DownloadResult downloadResult)
         {
-            ContentTypeDistribution[contentType]++;
+            RecentResults.Insert(0, downloadResult);
+            if (RecentResults.Count == 100)
+                RecentResults.RemoveAt(99);
+
+            ContentTypeDistribution[downloadResult.ContentType]++;
             NotifyPropertyChanged("TotalInQueue");
             NotifyPropertyChanged("TotalCrawled");
             NotifyPropertyChanged("Statustext");

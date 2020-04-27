@@ -19,7 +19,21 @@ namespace ItsyBitsy.Domain
         int TotalCrawled { get; }
         int TotalSuccess { get; set; }
         string StatusText { get; }
-        void Add(ContentType contentType);
+        public void Add(DownloadResult downloadResult);
+    }
+
+    public interface ISettings
+    {
+        bool FollowExtenalLinks { get; set; }
+        bool DownloadExternalContent { get; set; }
+        //bool RespectRobots { get; set; }
+        bool FollowRedirects { get; set; }
+        bool UseCookies { get; set; }
+        //bool IncludeImages { get; set; }
+        //bool IncludeCss { get; set; }
+        //bool IncludeJs { get; set; }
+        //bool IncludeJson { get; set; }
+        //bool IncludeOther { get; set; }
     }
 
     public class Crawler : ICrawler, IDisposable
@@ -32,29 +46,30 @@ namespace ItsyBitsy.Domain
         private readonly CancellationTokenSource _tokenSource;
         private bool _addNewLinks = true;
         private readonly PauseTokenSource _pauseToken;
+        private readonly ISettings _settings;
+        private readonly ICrawlProgress _progress;
 
-        public ICrawlProgress CrawlProgressReport { get; }
-
-        public Crawler(ICrawlProgress progress)
+        public Crawler(ICrawlProgress progress, ISettings settings)
         {
             _feeder = new Feeder();
-            _processor = new Processor();
+            _processor = new Processor(settings);
             _tokenSource = new CancellationTokenSource();
             _pauseToken = new PauseTokenSource();
-            CrawlProgressReport = progress;
+            _settings = settings;
+            _progress = progress;
         }
 
         public async Task StartAsync(Website website, int sessionId)
         {
             _website = website;
             _sessionId = sessionId;
-            _downloader = new Downloader(website.Seed);
+            _downloader = new Downloader(website.Seed, _settings);
 
             var seed = string.Intern(_website.Seed.ToString());
             var token = _tokenSource.Token;
 
             _feeder.AddSeed(seed);
-            CrawlProgressReport.TotalInQueue++;
+            _progress.TotalInQueue++;
 
             while (!token.IsCancellationRequested && _feeder.HasLinks())
             {
@@ -64,18 +79,19 @@ namespace ItsyBitsy.Domain
 
                 if (downloadResult.IsSuccessCode)
                 {
-                    CrawlProgressReport.TotalSuccess++;
+                    _progress.TotalSuccess++;
                     if (_addNewLinks && downloadResult.ContentType == ContentType.Html)
                     {
                         var newLinks = _processor.GetLinks(website.Seed, downloadResult.Content)
-                            .Where(x => x.IsContent || x.Link.StartsWith(seed))
+                            .Where(x => (x.IsContent && (_settings.DownloadExternalContent || x.Link.StartsWith(seed))) || (_settings.FollowExtenalLinks || x.Link.StartsWith(seed)))
                             .Select(x => x.Link);
 
-                        CrawlProgressReport.TotalInQueue += await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
+                        _progress.TotalInQueue += await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
                     }
                 }
 
-                CrawlProgressReport.Add(downloadResult.ContentType);
+                downloadResult.Content = string.Empty;//already processed
+                _progress.Add(downloadResult);
                 await _pauseToken.PauseIfRequestedAsync(token);
             }
         }

@@ -19,14 +19,13 @@
                                   SelectedItem="{Binding Path=SelectedWebsite}"
                                   SelectedValue="{Binding Path=SelectedWebsite.Id}"></ComboBox>
                         <TextBox Width="250" Padding="0,3" Margin="15,0,0,0" x:Name="websiteSeed" Text="https://"></TextBox>
-                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add</Button>
-                        <Label Margin="5" Name="AddWebsiteStatus"></Label>
+                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add Website</Button>
                     </WrapPanel>
                     <WrapPanel Name="pnlSettings">
                         <WrapPanel.DataContext>
                             <Binding Source="{x:Static local:Settings.Instance}" />
                         </WrapPanel.DataContext>
-                        <GroupBox Margin="5">
+                        <!--<GroupBox Margin="5">
                             <GroupBox.Header>Include Content Types</GroupBox.Header>
                             <WrapPanel>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
@@ -35,13 +34,13 @@
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeJson, Mode=TwoWay}" Margin="10" Name="contentJson">JSON</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeOther, Mode=TwoWay}" Margin="10" Name="contentOther">Other</CheckBox>
                             </WrapPanel>
-                        </GroupBox>
+                        </GroupBox>-->
                         <GroupBox Margin="5">
                             <GroupBox.Header>Crawl Options</GroupBox.Header>
                             <WrapPanel>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10">Follow External Links</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10">Download External Content</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>
+                                <!--<CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>-->
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects">Follow Redirects</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.UseCookies, Mode=TwoWay}" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
                             </WrapPanel>
@@ -60,7 +59,20 @@
                         </StackPanel.DataContext>
                         <ProgressBar Height="20" Margin="5" Value="{Binding TotalCrawled, Mode=OneWay}" Maximum="{Binding TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
                         <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
-                        <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress"/>
+                        <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress" 
+                                        ItemsSource="{Binding RecentResults}" 
+                                        AutoGenerateColumns="False"
+                                        VerticalScrollBarVisibility="Visible"
+                                        AlternatingRowBackground="AntiqueWhite"
+                                        Height="530">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Url" Binding="{Binding Uri}" MaxWidth="600" />
+                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
+                                <DataGridTextColumn Header="DownloadTime (ms)" Binding="{Binding DownloadTime}" />
+                                <DataGridTextColumn Header="Content Length (bytes)" Binding="{Binding ContentLengthBytes}" />
+                                <DataGridTextColumn Header="ContentType" Binding="{Binding ContentType}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </StackPanel>
                 </StackPanel>
             </TabItem>

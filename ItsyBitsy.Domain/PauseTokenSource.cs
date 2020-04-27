@@ -114,7 +114,7 @@ namespace ItsyBitsy.Domain
             }
         }
 
-        internal async Task PauseIfRequestedAsync(CancellationToken token = default(CancellationToken))
+        internal async Task PauseIfRequestedAsync(CancellationToken token = default)
         {
             Task resumeRequestTask = null;
 
