@@ -11,7 +11,7 @@
                 <StackPanel Margin="5">
                     <WrapPanel Margin="5" Name="pnlWebsites">
                         <WrapPanel.DataContext>
-                            <Binding Source="{x:Static local:CrawlProgress.Instance}" />
+                            <Binding Source="{x:Static local:CrawlContext.Instance}" />
                         </WrapPanel.DataContext>
                             <Label>Websites</Label>
                         <ComboBox Name="selectedWebsite" Width="200"

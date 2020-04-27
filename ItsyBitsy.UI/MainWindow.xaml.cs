@@ -23,15 +23,9 @@ namespace ItsyBitsy.UI
     public partial class MainWindow : Window
     {
         readonly CrawlManager _crawlManager;
-        //readonly CrawlProgress CrawlProgress;
-        //readonly Settings Settings;
-        //readonly CrawlContext CrawlContext;
 
         public MainWindow()
         {
-            //CrawlContext = CrawlContext.Instance;
-            //CrawlProgress = CrawlProgress.Instance;
-            //Settings = Settings.Instance;
             _crawlManager = new CrawlManager();
             InitializeComponent();
         }
