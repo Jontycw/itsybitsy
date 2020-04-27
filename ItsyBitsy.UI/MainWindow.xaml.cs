@@ -23,21 +23,24 @@ namespace ItsyBitsy.UI
     public partial class MainWindow : Window
     {
         readonly CrawlManager _crawlManager;
-        public CrawlProgressReport Progress => _crawlManager.CrawlProgressReport;
+        //readonly CrawlProgress CrawlProgress;
+        //readonly Settings Settings;
+        //readonly CrawlContext CrawlContext;
 
         public MainWindow()
         {
+            //CrawlContext = CrawlContext.Instance;
+            //CrawlProgress = CrawlProgress.Instance;
+            //Settings = Settings.Instance;
             _crawlManager = new CrawlManager();
             InitializeComponent();
-            DataContext = this;
         }
 
         private async void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             if (selectedWebsite.SelectedItem is Website website)
             {
-                //re-enable ui components on crawl complete event.
-                btnStart.IsEnabled = false; 
+                btnStart.IsEnabled = false;
                 pnlSettings.IsEnabled = false;
                 pnlWebsites.IsEnabled = false;
                 await _crawlManager.Start(website);

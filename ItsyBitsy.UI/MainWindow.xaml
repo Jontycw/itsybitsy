@@ -11,9 +11,9 @@
                 <StackPanel Margin="5">
                     <WrapPanel Margin="5" Name="pnlWebsites">
                         <WrapPanel.DataContext>
-                            <Binding Source="{x:Static local:CrawlContext.Instance}" />
+                            <Binding Source="{x:Static local:CrawlProgress.Instance}" />
                         </WrapPanel.DataContext>
-                        <Label>Websites</Label>
+                            <Label>Websites</Label>
                         <ComboBox Name="selectedWebsite" Width="200"
                                   ItemsSource="{Binding Path=WebsiteSeeds}" 
                                   SelectedItem="{Binding Path=SelectedWebsite}"
@@ -55,8 +55,11 @@
                         <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click">Hard Stop</Button>
                     </WrapPanel>
                     <StackPanel>
-                        <ProgressBar Height="20" Margin="5" Value="{Binding Progress.TotalCrawled, Mode=OneWay}" Maximum="{Binding Progress.TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
-                        <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding Progress.StatusText, Mode=OneWay}" />
+                        <StackPanel.DataContext>
+                            <Binding Source="{x:Static local:CrawlProgress.Instance}" />
+                        </StackPanel.DataContext>
+                        <ProgressBar Height="20" Margin="5" Value="{Binding TotalCrawled, Mode=OneWay}" Maximum="{Binding TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
+                        <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
                         <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress"/>
                     </StackPanel>
                 </StackPanel>
