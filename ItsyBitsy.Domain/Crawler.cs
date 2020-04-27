@@ -13,6 +13,15 @@ namespace ItsyBitsy.Domain
         Task StartAsync(Website website, int sessionId);
     }
 
+    public interface ICrawlProgress
+    {
+        int TotalInQueue { get; set; }
+        int TotalCrawled { get; }
+        int TotalSuccess { get; set; }
+        string StatusText { get; }
+        void Add(ContentType contentType);
+    }
+
     public class Crawler : ICrawler, IDisposable
     {
         private readonly IFeeder _feeder;
@@ -24,14 +33,15 @@ namespace ItsyBitsy.Domain
         private bool _addNewLinks = true;
         private readonly PauseTokenSource _pauseToken;
 
-        public CrawlProgressReport CrawlProgressReport { get; } = new CrawlProgressReport();
+        public ICrawlProgress CrawlProgressReport { get; }
 
-        public Crawler()
+        public Crawler(ICrawlProgress progress)
         {
             _feeder = new Feeder();
             _processor = new Processor();
             _tokenSource = new CancellationTokenSource();
             _pauseToken = new PauseTokenSource();
+            CrawlProgressReport = progress;
         }
 
         public async Task StartAsync(Website website, int sessionId)
@@ -40,7 +50,7 @@ namespace ItsyBitsy.Domain
             _sessionId = sessionId;
             _downloader = new Downloader(website.Seed);
 
-            var seed = String.Intern(_website.Seed.ToString());
+            var seed = string.Intern(_website.Seed.ToString());
             var token = _tokenSource.Token;
 
             _feeder.AddSeed(seed);
@@ -70,7 +80,7 @@ namespace ItsyBitsy.Domain
             }
         }
 
-        internal async Task Pause()
+        public async Task Pause()
         {
             await _pauseToken.PauseAsync();
         }

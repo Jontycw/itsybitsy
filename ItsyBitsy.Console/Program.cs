@@ -13,12 +13,7 @@ namespace ItsyBitsy.Crawler
             var website = await GetWebsite(args);
             var sessionId = await Repository.CreateNewSession();
 
-            var feeder = new Feeder();
-            var downloader = new Downloader(website.Seed);
-            var processor = new Processor();
-            feeder.AddSeed(website.Seed.ToString());
-
-            var crawler = new Domain.Crawler(feeder, processor);
+            var crawler = new Domain.Crawler(new CrawlProgress());
             await crawler.StartAsync(website, sessionId);
             await Repository.EndSession(sessionId);
             Console.WriteLine("Crawl Finished.");
