@@ -1,4 +1,5 @@
 ﻿using ItsyBitsy.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,6 +68,12 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
+        public static async Task<bool> PageExists(string newLinkFound)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            return await context.Page.AnyAsync(x => x.Uri == newLinkFound);
+        }
+
         public static async Task<Website> CreateWebsite(string seed)
         {
             if (!Uri.TryCreate(seed, UriKind.Absolute, out Uri uri))
@@ -104,10 +111,17 @@ namespace ItsyBitsy.Domain
             return null;
         }
 
-        internal static async Task AddToProcessQueue(IEnumerable<ProcessQueue> queueItems)
+        internal static async Task AddToProcessQueue(string link, int websiteId, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            context.ProcessQueue.AddRange(queueItems);
+            var newItem = new ProcessQueue()
+            {
+                Link = link,
+                SessionId = sessionId,
+                WebsiteId = websiteId,
+                TimeStamp = DateTime.Now
+            };
+            context.ProcessQueue.Add(newItem);
             await context.SaveChangesAsync();
         }
 

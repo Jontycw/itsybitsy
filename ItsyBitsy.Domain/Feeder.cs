@@ -8,34 +8,34 @@ using ItsyBitsy.Data;
 
 namespace ItsyBitsy.Domain
 {
-    public class ParentLink
-    {
-        public ParentLink(string link, int? parentId)
-        {
-            Link = link;
-            ParentId = parentId;
-        }
-        public string Link { get; }
-        public int? ParentId { get; }
+    //public class ParentLink
+    //{
+    //    public ParentLink(string link, int? parentId)
+    //    {
+    //        Link = link;
+    //        ParentId = parentId;
+    //    }
+    //    public string Link { get; }
+    //    public int? ParentId { get; }
 
-        public override int GetHashCode()
-        {
-            return Link.GetHashCode();
-        }
+    //    public override int GetHashCode()
+    //    {
+    //        return Link.GetHashCode();
+    //    }
 
-        public override bool Equals(object obj)
-        {
-            if (obj is ParentLink res)
-                return res.Link == this.Link;
+    //    public override bool Equals(object obj)
+    //    {
+    //        if (obj is ParentLink res)
+    //            return res.Link == this.Link;
 
-            return false;
-        }
-    }
+    //        return false;
+    //    }
+    //}
 
     public interface IFeeder
     {
         bool HasLinks();
-        ParentLink GetNextLink();
+        string GetNextLink();
         Task<int> AddLinks(IEnumerable<string> links, int parentId, int sessionId, int websiteId);
         void AddSeed(string link);
     }
@@ -44,15 +44,44 @@ namespace ItsyBitsy.Domain
     /// Bug: This class will queue the same link multiple times, need to check if link has already been processed, and only allow 
     /// new links to be returned when calling GetNextLink.
     /// </summary>
-    public class Feeder : IFeeder
+    public class Feeder : IFeeder, ICrawlWorker
     {
-        private readonly BlockingCollection<ParentLink> _processQueue;
-        private HashSet<ParentLink> _alreadyCrawled;
+        private HashSet<string> _alreadyCrawled;
+        private readonly BlockingCollection<string> _linksFound;
+        private readonly BlockingCollection<string> _downloadQueue;
+        private readonly int _websiteId;
+        private readonly int _sessionId;
 
-        public Feeder(int inMemorySize = 1000)
+        public Feeder(BlockingCollection<string> linksFound, BlockingCollection<string> downloadQueue, int websiteId, int sessionId)
         {
-            _processQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), inMemorySize);
-            _alreadyCrawled = new HashSet<ParentLink>();
+            _websiteId = websiteId;
+            _sessionId = sessionId;
+            _linksFound = linksFound;
+            _downloadQueue = downloadQueue;
+            _alreadyCrawled = new HashSet<string>();
+        }
+
+        public async void DoWork()
+        {
+            while(!_linksFound.IsCompleted)
+            {
+                var newLinkFound = _linksFound.Take();
+                var checkDbTask = Repository.PageExists(newLinkFound);
+                if (!_alreadyCrawled.Add(newLinkFound) && await checkDbTask)
+                    continue;
+                else
+                {
+                    //write to db if unable to add to download queue.
+                    int count = 0;
+                    while(!_downloadQueue.TryAdd(newLinkFound, 1000))
+                    {
+                        await Repository.AddToProcessQueue(newLinkFound, _websiteId, _sessionId);
+
+                        if (count++ > 5)
+                            throw new Exception("download queue is full");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -64,32 +93,29 @@ namespace ItsyBitsy.Domain
         {
             return await Task.Run(async () =>
             {
-                bool isHalfempty = _processQueue.Count < 500;
+                bool isHalfempty = _downloadQueue.Count < 500;
                 HashSet<string> existingLinks = new HashSet<string>();
                 List<ProcessQueue> overflowProcessQueueItems = new List<ProcessQueue>();
 
                 int linksAddedToQueue = 0;
                 foreach (var link in links)
                 {
-                    var newItem = new ParentLink(link, parentId);
-                    if (_alreadyCrawled.Add(newItem))
+                    if (_alreadyCrawled.Add(link))
                     {
                         if (isHalfempty)
                         {
                             overflowProcessQueueItems.Add(new ProcessQueue()
                             {
-                                Link = newItem.Link,
-                                ParentId = newItem.ParentId.Value,
+                                Link = link,
                                 SessionId = sessionId,
                                 WebsiteId = websiteId,
                             });
                         }
-                        else if(!_processQueue.TryAdd(newItem, 10))
+                        else if(!_downloadQueue.TryAdd(link, 10))
                         {
                             overflowProcessQueueItems.Add(new ProcessQueue()
                             {
-                                Link = newItem.Link,
-                                ParentId = newItem.ParentId.Value,
+                                Link = link,
                                 SessionId = sessionId,
                                 WebsiteId = websiteId,
                             });
@@ -106,7 +132,7 @@ namespace ItsyBitsy.Domain
                 if(overflowProcessQueueItems.Any())
                     await Repository.AddToProcessQueue(overflowProcessQueueItems);
 
-                if (_processQueue.Count < 500)
+                if (_downloadQueue.Count < 500)
                     await PopulateQueueFromDatabase(sessionId, websiteId);
 
                 await Repository.AddPageRelation(existingLinks, parentId);
@@ -121,7 +147,7 @@ namespace ItsyBitsy.Domain
             var queueItems = Repository.GetProcessQueueItems(sessionId, websiteId);
             foreach (var queueItem in queueItems)
             {
-                if (!_processQueue.TryAdd(new ParentLink(queueItem.Link, queueItem.ParentId), 50))
+                if (!_downloadQueue.TryAdd(queueItem.Link, 50))
                     break;
                 else
                     successfullyQueued.Add(queueItem);
@@ -132,24 +158,23 @@ namespace ItsyBitsy.Domain
 
         public void AddSeed(string link)
         {
-            var parentLink = new ParentLink(link, null);
-            _alreadyCrawled.Add(parentLink);
-            _processQueue.Add(parentLink);
+            _alreadyCrawled.Add(link);
+            _downloadQueue.Add(link);
         }
 
         public void CompleteAdding()
         {
-            _processQueue.CompleteAdding();
+            _downloadQueue.CompleteAdding();
         }
 
         public bool HasLinks()
         {
-            return _processQueue.Any();
+            return _downloadQueue.Any();
         }
 
-        public ParentLink GetNextLink()
+        public string GetNextLink()
         {
-            return _processQueue.Take();
+            return _downloadQueue.Take();
         }
     }
 }

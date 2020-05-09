@@ -1,5 +1,6 @@
 ﻿using ItsyBitsy.Data;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,11 @@ namespace ItsyBitsy.Domain
     public interface ICrawler
     {
         Task StartAsync(Website website, int sessionId);
+    }
+
+    public interface ICrawlWorker
+    {
+        void DoWork();
     }
 
     public interface ICrawlProgress
@@ -49,18 +55,34 @@ namespace ItsyBitsy.Domain
         private readonly ISettings _settings;
         private readonly ICrawlProgress _progress;
 
+        private readonly BlockingCollection<string> _downloadQueue;
+        private readonly BlockingCollection<string> _linksFound;
+        private readonly BlockingCollection<string> _downloadResults;
+        private readonly ICrawlWorker[] _crawlWorkers;
+
         public Crawler(ICrawlProgress progress, ISettings settings)
         {
-            _feeder = new Feeder();
+            _feeder = new Feeder(_linksFound, _downloadQueue);
             _processor = new Processor(settings);
             _tokenSource = new CancellationTokenSource();
             _pauseToken = new PauseTokenSource();
             _settings = settings;
             _progress = progress;
+            _downloadQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), 1000);
+            _downloadResults = new BlockingCollection<string>();
+            _linksFound = new BlockingCollection<string>();
+            _crawlWorkers = new ICrawlWorker[3];
         }
 
         public async Task StartAsync(Website website, int sessionId)
         {
+            for (int i = 0; i < _crawlWorkers.Length; i++)
+            {
+                Thread thread = new Thread(_crawlWorkers[i].DoWork);
+                thread.IsBackground = true;
+                thread.Start();
+            }
+
             _website = website;
             _sessionId = sessionId;
             _downloader = new Downloader(website.Seed, _settings);
