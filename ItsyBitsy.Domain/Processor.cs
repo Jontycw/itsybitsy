@@ -1,65 +1,67 @@
 ﻿using HtmlAgilityPack;
-using ItsyBitsy.Data;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
 {
-    public interface IProcessor
-    {
-        IEnumerable<PageLink> GetLinks(Uri seed, string content);
-        Task<IEnumerable<string>> GetLinksAsync(string content);
-    }
-
-    public struct PageLink
-    {
-        public PageLink(string link, bool isContent)
-        {
-            IsContent = isContent;
-            Link = link;
-        }
-
-        public bool IsContent { get; }
-        public string Link { get; }
-    }
-
-    public class Processor : IProcessor
+    public class Processor : CrawlWorkerBase
     {
         private readonly ISettings _settings;
-        public Processor(ISettings settings)
+        private readonly int _sessionId;
+        private readonly Website _website;
+        private readonly ICrawlProgress _progress;
+
+        public Processor(Website website, int sessionId, ISettings settings, ICrawlProgress progress)
         {
             _settings = settings;
+            _website = website;
+            _sessionId = sessionId;
+            _progress = progress;
         }
 
-        /// <summary>
-        /// Extracts data from an internet response.
-        /// </summary>
-        /// <param name="responseBody">internet response</param>
-        public IEnumerable<PageLink> GetLinks(Uri seed, string content)
+        protected override void DoWorkInternal()
         {
+            var downloadQueueItem = Crawler.DownloadResults.Take();
+            var pageId = Repository.SaveLink(downloadQueueItem, _website.Id, _sessionId);
+
+            if (downloadQueueItem.ContentType != ContentType.Html)
+                return;
+
             HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(content);
+            doc.LoadHtml(downloadQueueItem.Content);
             var docNode = doc.DocumentNode;
+            bool foundLinks = false;
 
             foreach (HtmlNode link in docNode?.SelectNodes("//a[@href] | //link[@href]"))
             {
                 HtmlAttribute att = link.Attributes["href"];
                 var pageLink = att.Value;
-                if (Uri.TryCreate(seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
-                    yield return new PageLink(absoluteUri.AbsoluteUri, link.Name == "link");
+                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                {
+                    Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                    _progress.TotalInQueue++;
+                    foundLinks = true;
+                }
             }
 
             foreach (HtmlNode link in docNode?.SelectNodes("//script[@src] | //img[@src]"))
             {
                 HtmlAttribute att = link.Attributes["src"];
                 var pageLink = att.Value;
-                if (Uri.TryCreate(seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
-                    yield return new PageLink(absoluteUri.AbsoluteUri, true);
+                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                {
+                    Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                    _progress.TotalInQueue++;
+                    foundLinks = true;
+                }
+            }
+
+            if(!foundLinks && Crawler.DownloadResults.IsCompleted)
+            {
+                Crawler.NewLinks.CompleteAdding();
             }
         }
+
+        protected override bool TerminateCondition() => Crawler.DownloadResults.IsCompleted;
 
         internal static bool IsHttpUri(string uri)
         {
@@ -69,11 +71,6 @@ namespace ItsyBitsy.Domain
             string scheme = new Uri(uri).Scheme;
             return ((string.Compare("http", scheme, StringComparison.OrdinalIgnoreCase) == 0) ||
                 (string.Compare("https", scheme, StringComparison.OrdinalIgnoreCase) == 0));
-        }
-
-        public Task<IEnumerable<string>> GetLinksAsync(string content)
-        {
-            throw new NotImplementedException();
         }
     }
 }

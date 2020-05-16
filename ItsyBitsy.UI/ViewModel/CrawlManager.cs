@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace ItsyBitsy.UI
 {
-    public sealed class CrawlManager : IDisposable
+    public sealed class CrawlManager
     {
         private readonly Crawler _crawler;
 
@@ -16,7 +16,7 @@ namespace ItsyBitsy.UI
         public async Task Start(Website website)
         {
             var sessionId = await Repository.CreateNewSession();
-            await _crawler.StartAsync(website, sessionId);
+            _crawler.Start(website, sessionId);
         }
 
         public async Task HardStop()
@@ -37,11 +37,6 @@ namespace ItsyBitsy.UI
         public async Task Resume()
         {
             await _crawler.Resume();
-        }
-
-        public void Dispose()
-        {
-            _crawler.Dispose();
         }
 
         public class ProgressEventArgs : EventArgs

@@ -11,18 +11,21 @@ namespace ItsyBitsy.Domain
 {
     public interface ICrawler
     {
-        Task StartAsync(Website website, int sessionId);
+        void Start(Website website, int sessionId);
     }
 
     public interface ICrawlWorker
     {
-        void DoWork();
+        void Start();
+        void Stop();
+        void Pause();
+        void Resume();
     }
 
     public interface ICrawlProgress
     {
         int TotalInQueue { get; set; }
-        int TotalCrawled { get; }
+        int TotalCrawled { get; set; }
         int TotalSuccess { get; set; }
         string StatusText { get; }
         public void Add(DownloadResult downloadResult);
@@ -42,81 +45,45 @@ namespace ItsyBitsy.Domain
         //bool IncludeOther { get; set; }
     }
 
-    public class Crawler : ICrawler, IDisposable
+    public class Crawler : ICrawler
     {
-        private readonly IFeeder _feeder;
-        private readonly IProcessor _processor;
-        private IDownloader _downloader;
-        private Website _website;
         private int _sessionId;
-        private readonly CancellationTokenSource _tokenSource;
+        private CancellationTokenSource _tokenSource;
         private bool _addNewLinks = true;
         private readonly PauseTokenSource _pauseToken;
         private readonly ISettings _settings;
         private readonly ICrawlProgress _progress;
 
-        private readonly BlockingCollection<string> _downloadQueue;
-        private readonly BlockingCollection<string> _linksFound;
-        private readonly BlockingCollection<string> _downloadResults;
-        private readonly ICrawlWorker[] _crawlWorkers;
+        private const int MaxCollectionSize = 1000;
+        public static readonly BlockingCollection<ParentLink> DownloadQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
+        public static readonly BlockingCollection<ParentLink> NewLinks = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
+        public static readonly BlockingCollection<DownloadResult> DownloadResults = new BlockingCollection<DownloadResult>(new ConcurrentQueue<DownloadResult>(), 10);
+
+        private ICrawlWorker[] _crawlWorkers;
 
         public Crawler(ICrawlProgress progress, ISettings settings)
         {
-            _feeder = new Feeder(_linksFound, _downloadQueue);
-            _processor = new Processor(settings);
             _tokenSource = new CancellationTokenSource();
             _pauseToken = new PauseTokenSource();
             _settings = settings;
             _progress = progress;
-            _downloadQueue = new BlockingCollection<string>(new ConcurrentQueue<string>(), 1000);
-            _downloadResults = new BlockingCollection<string>();
-            _linksFound = new BlockingCollection<string>();
-            _crawlWorkers = new ICrawlWorker[3];
         }
 
-        public async Task StartAsync(Website website, int sessionId)
+        public void Start(Website website, int sessionId)
         {
-            for (int i = 0; i < _crawlWorkers.Length; i++)
-            {
-                Thread thread = new Thread(_crawlWorkers[i].DoWork);
-                thread.IsBackground = true;
-                thread.Start();
-            }
-
-            _website = website;
             _sessionId = sessionId;
-            _downloader = new Downloader(website.Seed, _settings);
-
-            var seed = string.Intern(_website.Seed.ToString());
-            var token = _tokenSource.Token;
-
-            _feeder.AddSeed(seed);
-            _progress.TotalInQueue++;
-
-            while (!token.IsCancellationRequested && _feeder.HasLinks())
+            _crawlWorkers = new CrawlWorkerBase[3] 
             {
-                var nextLink = _feeder.GetNextLink();
-                var downloadResult = await _downloader.DownloadAsync(nextLink.Link);
-                var pageId = await Repository.SaveLink(downloadResult, _website.Id, _sessionId, nextLink.ParentId);
+                new Feeder(website.Id, sessionId, _progress, _addNewLinks),
+                new Downloader(website.Seed, _settings, _progress),
+                new Processor(website, sessionId, _settings, _progress), 
+            };
 
-                if (downloadResult.IsSuccessCode)
-                {
-                    _progress.TotalSuccess++;
-                    if (_addNewLinks && downloadResult.ContentType == ContentType.Html)
-                    {
-                        var newLinks = _processor.GetLinks(website.Seed, downloadResult.Content)
-                            .Where(x => (x.IsContent && (_settings.DownloadExternalContent || x.Link.StartsWith(seed))) || (_settings.FollowExtenalLinks || x.Link.StartsWith(seed)))
-                            .Select(x => x.Link);
+            for (int i = 0; i < _crawlWorkers.Length; i++)
+                _crawlWorkers[i].Start();
 
-                        _progress.TotalInQueue += await _feeder.AddLinks(newLinks, pageId, _sessionId, _website.Id);
-                    }
-                }
-
-                downloadResult.Content = string.Empty;//already processed
-                _progress.Add(downloadResult);
-
-                await _pauseToken.PauseIfRequestedAsync(token);
-            }
+            _progress.TotalInQueue++;
+            DownloadQueue.Add(new ParentLink(website.Seed.ToString(), null));
         }
 
         public async Task Pause()
@@ -137,11 +104,6 @@ namespace ItsyBitsy.Domain
         public void DrainStop()
         {
             _addNewLinks = false;
-        }
-
-        public void Dispose()
-        {
-            _downloader.Dispose();
         }
     }
 }

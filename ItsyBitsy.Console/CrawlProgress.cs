@@ -3,19 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace ItsyBitsy.Crawler
 {
     public class CrawlProgress : ICrawlProgress
     {
-        public int TotalInQueue { get; set; }
-        public int TotalCrawled => ContentTypeDistribution.Values.Sum();
+        int _totalInQueue;
+        public int TotalInQueue
+        {
+            get { return _totalInQueue; }
+            set
+            {
+                Interlocked.Increment(ref _totalInQueue);
+            }
+        }
+        public int TotalCrawled { get; set; }
         public int TotalSuccess { get; set; }
         public string StatusText => TotalInQueue > 0 ? $"{TotalCrawled}/{TotalInQueue} {((TotalCrawled * 1.0) / TotalInQueue * 100.0):0.##}% Errors:{TotalCrawled - TotalSuccess}" : string.Empty;
 
         public void Add(ContentType contentType)
         {
             ContentTypeDistribution[contentType]++;
+        }
+
+        public void Add(DownloadResult downloadResult)
+        {
+            throw new NotImplementedException();
         }
 
         private Dictionary<ContentType, int> ContentTypeDistribution { get; } = new Dictionary<ContentType, int>()

@@ -1,15 +1,18 @@
 ﻿using ItsyBitsy.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
 {
     public class Repository
     {
-        public static async Task<int> SaveLink(DownloadResult response, int websiteId, int sessionId, int? parentId)
+        public static int SaveLink(DownloadResult response, int websiteId, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
             var newPage = new Page()
@@ -24,17 +27,17 @@ namespace ItsyBitsy.Domain
             };
             context.Page.Add(newPage);
 
-            if (parentId.HasValue)
+            if (response.ParentId.HasValue)
             {
                 var newPageRelation = new PageRelation()
                 {
-                    ParentPageId = parentId.Value,
+                    ParentPageId = response.ParentId.Value,
                     ChildPage = newPage,
                 };
                 context.PageRelation.Add(newPageRelation);
             }
 
-            await context.SaveChangesAsync();
+            context.SaveChanges();
             return newPage.Id;
         }
 
@@ -68,10 +71,10 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
-        public static async Task<bool> PageExists(string newLinkFound)
+        public static bool PageExists(string newLinkFound, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            return await context.Page.AnyAsync(x => x.Uri == newLinkFound);
+            return context.Page.Any(x => x.SessionId == sessionId && x.Uri == newLinkFound);
         }
 
         public static async Task<Website> CreateWebsite(string seed)
@@ -83,9 +86,12 @@ namespace ItsyBitsy.Domain
                 throw new Exception("Only http and https are accepted.");
 
             var host = new Uri($"{uri.Scheme}://{uri.Host}");
-            using var downloader = new Downloader(host);
-            var downloadResult = await downloader.DownloadAsync(string.Empty);
-            var websiteHomeUri = downloadResult.Redirectedto;
+            var webResuest = WebRequest.CreateHttp(host);
+            webResuest.AutomaticDecompression = DecompressionMethods.All;
+            webResuest.AllowAutoRedirect = true;
+            webResuest.Method = "GET";
+            var response = webResuest.GetResponse();
+            var websiteHomeUri = response.ResponseUri.ToString();
 
             if(seed != websiteHomeUri)
                 throw new Exception($"{seed} redirects to {websiteHomeUri} please use this as the seed.");
@@ -111,18 +117,19 @@ namespace ItsyBitsy.Domain
             return null;
         }
 
-        internal static async Task AddToProcessQueue(string link, int websiteId, int sessionId)
+        internal static void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
             var newItem = new ProcessQueue()
             {
                 Link = link,
+                ParentId = parentId,
                 SessionId = sessionId,
                 WebsiteId = websiteId,
                 TimeStamp = DateTime.Now
             };
             context.ProcessQueue.Add(newItem);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         internal static IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId)
@@ -137,11 +144,11 @@ namespace ItsyBitsy.Domain
             return nextQueueItems.ToList();
         }
 
-        internal static async Task RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued)
+        internal static void RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
             context.ProcessQueue.RemoveRange(successfullyQueued);
-            await context.SaveChangesAsync();
+            context.SaveChanges();
         }
 
         internal static async Task AddPageRelation(IEnumerable<string> existingLinks, int parentId)

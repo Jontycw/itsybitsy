@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace ItsyBitsy.UI
 {
@@ -21,6 +22,14 @@ namespace ItsyBitsy.UI
         private void App_Exit(object sender, ExitEventArgs e)
         {
             Settings.Instance.Save();
+        }
+
+        void App_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            // Process unhandled exception
+
+            // Prevent default unhandled exception processing
+            e.Handled = true;
         }
     }
 }

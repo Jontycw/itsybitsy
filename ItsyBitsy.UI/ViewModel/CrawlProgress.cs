@@ -1,9 +1,14 @@
 ﻿using ItsyBitsy.Domain;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace ItsyBitsy.UI
 {
@@ -11,16 +16,38 @@ namespace ItsyBitsy.UI
     {
         private static readonly Lazy<CrawlProgress> lazy = new Lazy<CrawlProgress>(new CrawlProgress());
         public static CrawlProgress Instance { get { return lazy.Value; } }
-        private CrawlProgress() 
+        public ObservableCollection<DownloadResult> RecentResults { get; } = new ObservableCollection<DownloadResult>();
+
+        private object _lock;
+
+        private CrawlProgress()
         {
-            RecentResults = new ObservableCollection<DownloadResult>();
+            _lock = new object();
+            BindingOperations.EnableCollectionSynchronization(RecentResults, _lock);
         }
 
-        public int TotalInQueue { get; set; }
-        public int TotalCrawled => ContentTypeDistribution.Values.Sum();
-        public int TotalSuccess { get; set; }
-        public string StatusText => TotalInQueue > 0 ? $"{TotalCrawled}/{TotalInQueue} {((TotalCrawled * 1.0) / TotalInQueue * 100.0):0.##}% Errors:{TotalCrawled - TotalSuccess}" : string.Empty;
-        public ObservableCollection<DownloadResult> RecentResults { get; }
+        int _totalInQueue = 0;
+        public int TotalInQueue
+        {
+            get { return _totalInQueue; }
+            set { Interlocked.Increment(ref _totalInQueue); }
+        }
+
+        int _totalCrawled = 0;
+        public int TotalCrawled
+        {
+            get { return _totalCrawled; }
+            set { Interlocked.Increment(ref _totalCrawled); }
+        }
+
+        int _totalSuccess = 0;
+        public int TotalSuccess
+        {
+            get { return _totalSuccess; }
+            set { Interlocked.Increment(ref _totalSuccess); }
+        }
+
+        public string StatusText => _totalSuccess > 0 ? $"{_totalCrawled}/{_totalInQueue} {((_totalCrawled * 1.0) / _totalInQueue * 100.0):0.##}%" : string.Empty;
 
         public void Add(DownloadResult downloadResult)
         {
@@ -34,7 +61,7 @@ namespace ItsyBitsy.UI
             NotifyPropertyChanged("Statustext");
         }
 
-        private  Dictionary<ContentType, int> ContentTypeDistribution { get; } = new Dictionary<ContentType, int>()
+        private Dictionary<ContentType, int> ContentTypeDistribution { get; } = new Dictionary<ContentType, int>()
         {
             { ContentType.Css, 0 },
             { ContentType.Html, 0 },

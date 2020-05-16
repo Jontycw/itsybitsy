@@ -6,11 +6,13 @@ namespace ItsyBitsy.Domain
 {
     public class DownloadResult
     {
-        public DownloadResult(string uri)
+        public DownloadResult(ParentLink parentLink)
         {
-            Uri = uri;
+            Uri = parentLink.Link;
+            ParentId = parentLink.ParentId;
         }
 
+        public int? ParentId { get; }
         public string Uri { get; }
         public string Status { get; internal set; }
         public bool IsSuccessCode { get; internal set; }
@@ -20,5 +22,19 @@ namespace ItsyBitsy.Domain
         public long DownloadTime { get; internal set; }
         public int ContentLengthBytes { get; internal set; }
         public string Redirectedto { get; internal set; }
+
+        public DownloadResult ToViewdownloadResult()
+        {
+            return new DownloadResult(new ParentLink(Uri, ParentId))
+            {
+                Status = Status,
+                IsSuccessCode = IsSuccessCode,
+                Exception = Exception,
+                ContentType = ContentType,
+                DownloadTime = DownloadTime,
+                ContentLengthBytes = ContentLengthBytes,
+                Redirectedto = Redirectedto
+            };
+        }
     }
 }

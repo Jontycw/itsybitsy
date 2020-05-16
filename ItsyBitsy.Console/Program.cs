@@ -1,62 +1,36 @@
 ﻿using ItsyBitsy.Domain;
 using System;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ItsyBitsy.Crawler
 {
-    //todo: Find all paths to a page.
     public class Program
     {
-        static async Task Main(string[] args)
+        static CrawlProgress prog = new CrawlProgress();
+        static void Main(string[] args)
         {
-            var website = await GetWebsite(args);
-            var sessionId = await Repository.CreateNewSession();
+            var gg = new Program();
+            var threadDelegate = new ThreadStart(gg.IncNums);
 
-            var crawler = new Domain.Crawler(new CrawlProgress());
-            await crawler.StartAsync(website, sessionId);
-            await Repository.EndSession(sessionId);
-            Console.WriteLine("Crawl Finished.");
+            Thread t1 = new Thread(threadDelegate);
+            Thread t2 = new Thread(threadDelegate);
+            t1.Start();
+            t2.Start();
+
+            t1.Join();
+            t2.Join();
+
+            Console.WriteLine(prog.TotalInQueue);
+            Console.ReadLine();
         }
 
-        private static async Task<Website> GetWebsite(string[] args)
+        public void IncNums()
         {
-            if (args.Length == 1 && int.TryParse(args[0], out int websiteId))
+            for (int i = 0; i < 100; i++)
             {
-                var website = await Repository.GetDomainWebsite(websiteId);
-                if (website == null)
-                {
-                    return await GetWebsite(new string[0]);
-                }
-                else
-                {
-                    Console.WriteLine($"Starting crawl for {website.Seed}");
-                    return website;
-                }
-            }
-            else
-            {
-                string userWebsiteId;
-                int parsedWebsiteId;
-                do
-                {
-                    Console.Write("Please enter a website Id:");
-                    userWebsiteId = Console.ReadLine();
-                    Console.Clear();
-
-                }
-                while (!int.TryParse(userWebsiteId, out parsedWebsiteId));
-
-                var website = await Repository.GetDomainWebsite(parsedWebsiteId);
-                if (website == null)
-                {
-                    return await GetWebsite(new string[0]);
-                }
-                else
-                {
-                    Console.WriteLine($"Starting crawl for {website.Seed}");
-                    return website;
-                }
+                prog.TotalInQueue++;
             }
         }
     }
