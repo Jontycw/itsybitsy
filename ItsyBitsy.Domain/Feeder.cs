@@ -1,5 +1,7 @@
 ﻿using ItsyBitsy.Data;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ItsyBitsy.Domain
 {
@@ -49,11 +51,18 @@ namespace ItsyBitsy.Domain
         }
         protected override bool TerminateCondition() => Crawler.NewLinks.IsCompleted;
 
+        private HashSet<string> _blacklist = new HashSet<string>()
+        {
+            "https://www.googletagmanager.com",
+            "https://www.google.com"
+        };
+
         protected override void DoWorkInternal()
         {
             if (Crawler.NewLinks.TryTake(out ParentLink nextLink, 1000))
             {
-                if (!_alreadyCrawled.Add(nextLink.Link) || Repository.PageExists(nextLink.Link, _sessionId))
+                if (!_alreadyCrawled.Add(nextLink.Link) || Repository.PageExists(nextLink.Link, _sessionId)
+                    || _blacklist.Any(x => nextLink.Link.StartsWith(x)))
                 {
                     _progress.TotalCrawled++;
                     return;
