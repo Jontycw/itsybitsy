@@ -1,14 +1,10 @@
 ﻿using ItsyBitsy.Domain;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Threading;
 
 namespace ItsyBitsy.UI
 {
@@ -18,7 +14,7 @@ namespace ItsyBitsy.UI
         public static CrawlProgress Instance { get { return lazy.Value; } }
         public ObservableCollection<DownloadResult> RecentResults { get; } = new ObservableCollection<DownloadResult>();
 
-        private object _lock;
+        private readonly object _lock;
 
         private CrawlProgress()
         {

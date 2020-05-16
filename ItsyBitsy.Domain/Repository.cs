@@ -1,11 +1,9 @@
 ﻿using ItsyBitsy.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
@@ -93,7 +91,7 @@ namespace ItsyBitsy.Domain
             var response = webResuest.GetResponse();
             var websiteHomeUri = response.ResponseUri.ToString();
 
-            if(seed != websiteHomeUri)
+            if (seed != websiteHomeUri)
                 throw new Exception($"{seed} redirects to {websiteHomeUri} please use this as the seed.");
 
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();

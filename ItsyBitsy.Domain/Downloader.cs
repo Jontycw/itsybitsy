@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
-using ItsyBitsy.Data;
 
 namespace ItsyBitsy.Domain
 {
@@ -119,7 +115,7 @@ namespace ItsyBitsy.Domain
                     _semaphoreSlim.Release();
                 });
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine(e);
             }

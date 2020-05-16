@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ItsyBitsy.Domain
+﻿namespace ItsyBitsy.Domain
 {
     public enum ContentType : byte
     {

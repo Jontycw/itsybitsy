@@ -2,7 +2,7 @@
 {
     internal class ReportProgress : CrawlWorkerBase
     {
-        private ICrawlProgress _progress;
+        private readonly ICrawlProgress _progress;
 
         public ReportProgress(ICrawlProgress progress)
         {
@@ -11,7 +11,7 @@
 
         protected override void DoWorkInternal()
         {
-            
+
         }
 
         protected override bool TerminateCondition()

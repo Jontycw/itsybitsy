@@ -1,6 +1,4 @@
-﻿using ItsyBitsy.Data;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 
 namespace ItsyBitsy.Domain
 {

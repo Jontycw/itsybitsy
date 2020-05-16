@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace ItsyBitsy.Data
 {
@@ -11,7 +8,7 @@ namespace ItsyBitsy.Data
     {
         public virtual Page ParentPage { get; set; }
 
-        [Key, Column(Order=1), ForeignKey("ParentPage")]
+        [Key, Column(Order = 1), ForeignKey("ParentPage")]
         public int ParentPageId { get; set; }
 
         public virtual Page ChildPage { get; set; }

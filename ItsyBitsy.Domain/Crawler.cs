@@ -1,9 +1,4 @@
-﻿using ItsyBitsy.Data;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,7 +43,7 @@ namespace ItsyBitsy.Domain
     public class Crawler : ICrawler
     {
         private int _sessionId;
-        private CancellationTokenSource _tokenSource;
+        private readonly CancellationTokenSource _tokenSource;
         private bool _addNewLinks = true;
         private readonly PauseTokenSource _pauseToken;
         private readonly ISettings _settings;
@@ -72,11 +67,11 @@ namespace ItsyBitsy.Domain
         public void Start(Website website, int sessionId)
         {
             _sessionId = sessionId;
-            _crawlWorkers = new CrawlWorkerBase[3] 
+            _crawlWorkers = new CrawlWorkerBase[3]
             {
                 new Feeder(website.Id, sessionId, _progress, _addNewLinks),
                 new Downloader(website.Seed, _settings, _progress),
-                new Processor(website, sessionId, _settings, _progress), 
+                new Processor(website, sessionId, _settings, _progress),
             };
 
             for (int i = 0; i < _crawlWorkers.Length; i++)

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using ItsyBitsy.Data;
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using System.Threading.Tasks;
-using ItsyBitsy.Data;
 
 namespace ItsyBitsy.Domain
 {
@@ -38,7 +33,7 @@ namespace ItsyBitsy.Domain
     /// </summary>
     public class Feeder : CrawlWorkerBase
     {
-        private HashSet<string> _alreadyCrawled;
+        private readonly HashSet<string> _alreadyCrawled;
         private readonly int _websiteId;
         private readonly int _sessionId;
         private readonly bool _addNewLinks;

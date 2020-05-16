@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
+﻿using System.Threading;
 
 namespace ItsyBitsy.Domain
 {
@@ -53,7 +50,7 @@ namespace ItsyBitsy.Domain
             {
                 while (!TerminateCondition())
                 {
-                    if(Delay > 0)
+                    if (Delay > 0)
                         Thread.Sleep(Delay);
 
                     DoWorkInternal();

@@ -55,7 +55,7 @@ namespace ItsyBitsy.Domain
                 }
             }
 
-            if(!foundLinks && Crawler.DownloadResults.IsCompleted)
+            if (!foundLinks && Crawler.DownloadResults.IsCompleted)
             {
                 Crawler.NewLinks.CompleteAdding();
             }

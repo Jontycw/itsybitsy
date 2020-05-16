@@ -1,7 +1,4 @@
-﻿using ItsyBitsy.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,8 +6,8 @@ namespace ItsyBitsy.UnitTest
 {
     public class FeederTest
     {
-        private static List<string> StringList1 = new List<string>() { "http://5" };
-        private static List<string> StringList4 = new List<string>() { "http://1", "http://2", "http://3", "http://4" };
+        private static readonly List<string> StringList1 = new List<string>() { "http://5" };
+        private static readonly List<string> StringList4 = new List<string>() { "http://1", "http://2", "http://3", "http://4" };
 
         [Fact]
         public async Task DontReprocessTheSameLink()

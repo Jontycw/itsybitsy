@@ -1,6 +1,3 @@
-using ItsyBitsy.Domain;
-using System;
-using System.Linq;
 using Xunit;
 
 namespace ItsyBitsy.UnitTest

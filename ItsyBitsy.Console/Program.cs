@@ -1,14 +1,11 @@
-﻿using ItsyBitsy.Domain;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ItsyBitsy.Crawler
 {
     public class Program
     {
-        static CrawlProgress prog = new CrawlProgress();
+        static readonly CrawlProgress prog = new CrawlProgress();
         static void Main(string[] args)
         {
             var gg = new Program();

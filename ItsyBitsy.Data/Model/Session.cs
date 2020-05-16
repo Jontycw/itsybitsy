@@ -15,7 +15,7 @@ namespace ItsyBitsy.Data
         public DateTime StartTime { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime? EndTime{ get; set; }
+        public DateTime? EndTime { get; set; }
         public virtual ICollection<Page> Pages { get; set; }
     }
 }
