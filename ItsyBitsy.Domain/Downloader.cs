@@ -68,11 +68,11 @@ namespace ItsyBitsy.Domain
                     DownloadResult result = new DownloadResult(nextLink);
 
                     bool isDomainResource = result.Uri.StartsWith(_seed);
-                    bool shouldAddLink(ContentType x) => x == ContentType.Html && (_followExternalLinks || isDomainResource)
-                            || x != ContentType.Html && (_downloadExternalContent || isDomainResource);
+                    bool shouldAddLink(ContentType x) => (x == ContentType.Html && (_followExternalLinks || isDomainResource))
+                            || (x != ContentType.Html && (_downloadExternalContent || isDomainResource));
 
                     try
-                    {
+                   {
                         Stopwatch watch = new Stopwatch();
 
                         watch.Start();
@@ -112,7 +112,10 @@ namespace ItsyBitsy.Domain
                         }
                     }
 
+                })
+                .ContinueWith((x) => {
                     _semaphoreSlim.Release();
+
                 });
             }
             catch (Exception e)

@@ -8,8 +8,55 @@ using System.Threading.Tasks;
 
 namespace ItsyBitsy.Domain
 {
-    public class Repository
+    public interface IRepository
     {
+        bool PageExists(string newLinkFound, int sessionId);
+        void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId);
+        IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId);
+        void RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued);
+    }
+
+    public class Repository : IRepository
+    {
+        public bool PageExists(string newLinkFound, int sessionId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            return context.Page.Any(x => x.SessionId == sessionId && x.Uri == newLinkFound);
+        }
+
+        public void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            var newItem = new ProcessQueue()
+            {
+                Link = link,
+                ParentId = parentId,
+                SessionId = sessionId,
+                WebsiteId = websiteId
+            };
+            context.ProcessQueue.Add(newItem);
+            context.SaveChanges();
+        }
+
+        public IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            var nextQueueItems = (from queueItem in context.ProcessQueue
+                                  where queueItem.SessionId == sessionId && queueItem.WebsiteId == websiteId
+                                  orderby queueItem.TimeStamp
+                                  select queueItem)
+                                 .Take(400);
+
+            return nextQueueItems.ToList();
+        }
+
+        public void RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued)
+        {
+            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+            context.ProcessQueue.RemoveRange(successfullyQueued);
+            context.SaveChanges();
+        }
+
         public static int SaveLink(DownloadResult response, int websiteId, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
@@ -69,11 +116,7 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
-        public static bool PageExists(string newLinkFound, int sessionId)
-        {
-            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            return context.Page.Any(x => x.SessionId == sessionId && x.Uri == newLinkFound);
-        }
+        
 
         public static async Task<Website> CreateWebsite(string seed)
         {
@@ -113,40 +156,6 @@ namespace ItsyBitsy.Domain
                 return new Website(dbWebsite);
 
             return null;
-        }
-
-        internal static void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId)
-        {
-            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            var newItem = new ProcessQueue()
-            {
-                Link = link,
-                ParentId = parentId,
-                SessionId = sessionId,
-                WebsiteId = websiteId,
-                TimeStamp = DateTime.Now
-            };
-            context.ProcessQueue.Add(newItem);
-            context.SaveChanges();
-        }
-
-        internal static IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId)
-        {
-            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            var nextQueueItems = (from queueItem in context.ProcessQueue
-                                  where queueItem.SessionId == sessionId && queueItem.WebsiteId == websiteId
-                                  orderby queueItem.TimeStamp
-                                  select queueItem)
-                                 .Take(400);
-
-            return nextQueueItems.ToList();
-        }
-
-        internal static void RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued)
-        {
-            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            context.ProcessQueue.RemoveRange(successfullyQueued);
-            context.SaveChanges();
         }
 
         internal static async Task AddPageRelation(IEnumerable<string> existingLinks, int parentId)

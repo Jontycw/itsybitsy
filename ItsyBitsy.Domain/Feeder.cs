@@ -38,16 +38,16 @@ namespace ItsyBitsy.Domain
         private readonly HashSet<string> _alreadyCrawled;
         private readonly int _websiteId;
         private readonly int _sessionId;
-        private readonly bool _addNewLinks;
         private readonly ICrawlProgress _progress;
+        private readonly IRepository _repository;
 
-        public Feeder(int websiteId, int sessionId, ICrawlProgress progress, bool addNewLinks)
+        public Feeder(int websiteId, int sessionId, ICrawlProgress progress)
         {
             _websiteId = websiteId;
             _sessionId = sessionId;
             _alreadyCrawled = new HashSet<string>();
             _progress = progress;
-            _addNewLinks = addNewLinks;
+            _repository = Factory.GetInstance<IRepository>();
         }
         protected override bool TerminateCondition() => Crawler.NewLinks.IsCompleted;
 
@@ -61,7 +61,7 @@ namespace ItsyBitsy.Domain
         {
             if (Crawler.NewLinks.TryTake(out ParentLink nextLink, 1000))
             {
-                if (!_alreadyCrawled.Add(nextLink.Link) || Repository.PageExists(nextLink.Link, _sessionId)
+                if (!_alreadyCrawled.Add(nextLink.Link) || _repository.PageExists(nextLink.Link, _sessionId)
                     || _blacklist.Any(x => nextLink.Link.StartsWith(x)))
                 {
                     _progress.TotalCrawled++;
@@ -69,7 +69,7 @@ namespace ItsyBitsy.Domain
                 }
 
                 if (!Crawler.DownloadQueue.TryAdd(nextLink, 1000))
-                    Repository.AddToProcessQueue(nextLink.Link, nextLink.ParentId ?? -1, _websiteId, _sessionId);
+                    _repository.AddToProcessQueue(nextLink.Link, nextLink.ParentId ?? -1, _websiteId, _sessionId);
             }
             else
             {
@@ -80,7 +80,7 @@ namespace ItsyBitsy.Domain
         private void PopulateQueueFromDatabase()
         {
             List<ProcessQueue> successfullyQueued = new List<ProcessQueue>();
-            var queueItems = Repository.GetProcessQueueItems(_sessionId, _websiteId);
+            var queueItems = _repository.GetProcessQueueItems(_sessionId, _websiteId);
             foreach (var queueItem in queueItems)
             {
                 if (!Crawler.DownloadQueue.TryAdd(new ParentLink(queueItem.Link, queueItem.ParentId), 50))
@@ -89,7 +89,7 @@ namespace ItsyBitsy.Domain
                     successfullyQueued.Add(queueItem);
             }
 
-            Repository.RemoveQueuedItems(successfullyQueued);
+            _repository.RemoveQueuedItems(successfullyQueued);
         }
     }
 }

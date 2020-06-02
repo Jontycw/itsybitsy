@@ -44,7 +44,6 @@ namespace ItsyBitsy.Domain
     {
         private int _sessionId;
         private readonly CancellationTokenSource _tokenSource;
-        private bool _addNewLinks = true;
         private readonly PauseTokenSource _pauseToken;
         private readonly ISettings _settings;
         private readonly ICrawlProgress _progress;
@@ -69,7 +68,7 @@ namespace ItsyBitsy.Domain
             _sessionId = sessionId;
             _crawlWorkers = new CrawlWorkerBase[3]
             {
-                new Feeder(website.Id, sessionId, _progress, _addNewLinks),
+                new Feeder(website.Id, sessionId, _progress),
                 new Downloader(website.Seed, _settings, _progress),
                 new Processor(website, sessionId, _settings, _progress),
             };
@@ -98,7 +97,6 @@ namespace ItsyBitsy.Domain
         }
         public void DrainStop()
         {
-            _addNewLinks = false;
         }
     }
 }
