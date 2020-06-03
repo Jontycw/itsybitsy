@@ -13,9 +13,10 @@ namespace ItsyBitsy.Domain
     public abstract class CrawlWorkerBase : ICrawlWorker
     {
         private readonly Thread _workerThread;
-
-        public CrawlWorkerBase()
+        private readonly bool _separateThread;
+        public CrawlWorkerBase(bool separateThread)
         {
+            _separateThread = separateThread;
             _workerThread = new Thread(DoWork)
             {
                 IsBackground = true
@@ -75,7 +76,10 @@ namespace ItsyBitsy.Domain
 
         public void Start()
         {
-            _workerThread.Start();
+            if (_separateThread)
+                _workerThread.Start();
+            else
+                DoWorkInternal();
         }
     }
 }

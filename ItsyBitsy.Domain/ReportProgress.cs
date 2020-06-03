@@ -4,7 +4,8 @@
     {
         private readonly ICrawlProgress _progress;
 
-        public ReportProgress(ICrawlProgress progress)
+        public ReportProgress(ICrawlProgress progress, bool separateThread = true)
+            : base(separateThread)
         {
             _progress = progress;
         }

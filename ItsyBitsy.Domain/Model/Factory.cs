@@ -11,7 +11,7 @@ namespace ItsyBitsy.Domain
         public static void Register<I, C>()
             where C : class, I, new()
         {
-            _instances.Add(typeof(I), typeof(C));
+            _instances.TryAdd(typeof(I), typeof(C));
         }
 
         public static I GetInstance<I>()

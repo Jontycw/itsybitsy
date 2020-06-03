@@ -1,4 +1,7 @@
 ﻿using System.Net.Http;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("ItsyBitsy.UnitTest")]
 
 namespace ItsyBitsy.Domain
 {

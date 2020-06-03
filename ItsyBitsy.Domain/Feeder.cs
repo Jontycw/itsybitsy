@@ -41,7 +41,8 @@ namespace ItsyBitsy.Domain
         private readonly ICrawlProgress _progress;
         private readonly IRepository _repository;
 
-        public Feeder(int websiteId, int sessionId, ICrawlProgress progress)
+        public Feeder(int websiteId, int sessionId, ICrawlProgress progress, bool separateThread = true)
+            : base(separateThread)
         {
             _websiteId = websiteId;
             _sessionId = sessionId;

@@ -14,6 +14,7 @@ namespace ItsyBitsy.Domain
         void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId);
         IEnumerable<ProcessQueue> GetProcessQueueItems(int sessionId, int websiteId);
         void RemoveQueuedItems(IEnumerable<ProcessQueue> successfullyQueued);
+        int SaveLink(DownloadResult downloadQueueItem, int id, int sessionId);
     }
 
     public class Repository : IRepository
@@ -57,7 +58,7 @@ namespace ItsyBitsy.Domain
             context.SaveChanges();
         }
 
-        public static int SaveLink(DownloadResult response, int websiteId, int sessionId)
+        public int SaveLink(DownloadResult response, int websiteId, int sessionId)
         {
             using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
             var newPage = new Page()

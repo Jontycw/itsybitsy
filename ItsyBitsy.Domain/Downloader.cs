@@ -25,7 +25,8 @@ namespace ItsyBitsy.Domain
         private readonly ICrawlProgress _progress;
         private readonly string _seed;
 
-        public Downloader(Uri host, ISettings settings, ICrawlProgress progress)
+        public Downloader(Uri host, ISettings settings, ICrawlProgress progress, bool separateThread = true)
+            : base(separateThread)
         {
             _seed = string.Intern(host.ToString());
             _progress = progress;
@@ -72,7 +73,7 @@ namespace ItsyBitsy.Domain
                             || (x != ContentType.Html && (_downloadExternalContent || isDomainResource));
 
                     try
-                   {
+                    {
                         Stopwatch watch = new Stopwatch();
 
                         watch.Start();
@@ -113,7 +114,8 @@ namespace ItsyBitsy.Domain
                     }
 
                 })
-                .ContinueWith((x) => {
+                .ContinueWith((x) =>
+                {
                     _semaphoreSlim.Release();
 
                 });

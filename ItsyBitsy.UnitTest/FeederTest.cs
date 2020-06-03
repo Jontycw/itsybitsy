@@ -10,13 +10,13 @@ namespace ItsyBitsy.UnitTest
 {
     public class FeederTest
     {
-        private static readonly List<string> StringList1 = new List<string>() { "http://5" };
-        private static readonly List<string> StringList4 = new List<string>() { "http://1", "http://2", "http://3", "http://4" };
-
         static FeederTest()
         {
             RegisterUTestFactory.Register();
         }
+
+        private static readonly List<string> StringList1 = new List<string>() { "http://5" };
+        private static readonly List<string> StringList4 = new List<string>() { "http://1", "http://2", "http://3", "http://4" };
 
         [Fact]
         public void Feeder_AddToDownloadQueue()

@@ -45,5 +45,11 @@ namespace ItsyBitsy.UnitTes
         {
             _processQueues.RemoveAll(x => successfullyQueued.Any(y => y.Id == x.Id));
         }
+
+        int pageId = 1;
+        public int SaveLink(DownloadResult downloadQueueItem, int id, int sessionId)
+        {
+            return pageId++;
+        }
     }
 }

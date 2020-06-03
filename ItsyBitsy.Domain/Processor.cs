@@ -9,19 +9,22 @@ namespace ItsyBitsy.Domain
         private readonly int _sessionId;
         private readonly Website _website;
         private readonly ICrawlProgress _progress;
+        private readonly IRepository _repository;
 
-        public Processor(Website website, int sessionId, ISettings settings, ICrawlProgress progress)
+        public Processor(Website website, int sessionId, ISettings settings, ICrawlProgress progress, bool separateThread = true)
+            : base(separateThread)
         {
             _settings = settings;
             _website = website;
             _sessionId = sessionId;
             _progress = progress;
+            _repository = Factory.GetInstance<IRepository>();
         }
 
         protected override void DoWorkInternal()
         {
             var downloadQueueItem = Crawler.DownloadResults.Take();
-            var pageId = Repository.SaveLink(downloadQueueItem, _website.Id, _sessionId);
+            var pageId = _repository.SaveLink(downloadQueueItem, _website.Id, _sessionId);
 
             if (downloadQueueItem.ContentType != ContentType.Html)
                 return;
