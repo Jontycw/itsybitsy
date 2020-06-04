@@ -24,6 +24,10 @@ namespace ItsyBitsy.UI
                 btnStart.IsEnabled = false;
                 pnlSettings.IsEnabled = false;
                 pnlWebsites.IsEnabled = false;
+                btnPause.IsEnabled = true;
+                btnResume.IsEnabled = true;
+                btnHardStop.IsEnabled = true;
+                btnDrainStop.IsEnabled = true;
                 await _crawlManager.Start(website);
             }
         }

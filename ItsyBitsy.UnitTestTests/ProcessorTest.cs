@@ -1,26 +1,17 @@
 using ItsyBitsy.Domain;
 using ItsyBitsy.UnitTest.Mocks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using Xunit;
 
 namespace ItsyBitsy.UnitTest
 {
-    public class ProcessorTest : IDisposable
+    [TestClass]
+    public class ProcessorTest
     {
-        public ProcessorTest()
-        {
-            RegisterUTestFactory.Register();
-        }
-
-        public void Dispose()
-        {
-            RegisterUTestFactory.Clear();
-        }
-
-        [Fact]
+        [TestMethod]
         public void LinkExtractionTest()
         {
-            Assert.Empty(Crawler.NewLinks);
+            Assert.IsTrue(Crawler.NewLinks.Count == 0);
 
             var website = new Website(new Data.Website() { Seed = "http://seed.co.za/" });
             var processor = new Processor(website, 1, new MockSettings(), new MockProgess(), false);
@@ -35,7 +26,7 @@ namespace ItsyBitsy.UnitTest
             });
             processor.Start();
 
-            Assert.Equal(7, Crawler.NewLinks.Count);
+            Assert.AreEqual(7, Crawler.NewLinks.Count);
 
             while (Crawler.NewLinks.Count > 0)
                 Crawler.NewLinks.Take();

@@ -13,5 +13,10 @@ namespace ItsyBitsy.UnitTest
         {
             Factory.Register<IRepository, MockRepository>();
         }
+
+        public static void Clear()
+        {
+            Factory.Clear();
+        }
     }
 }

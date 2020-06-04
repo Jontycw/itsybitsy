@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ItsyBitsy.Domain;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace ItsyBitsy.UI
@@ -10,6 +11,7 @@ namespace ItsyBitsy.UI
     {
         public App()
         {
+            Factory.Register<IRepository, Repository>();
             Exit += App_Exit;
         }
 

@@ -38,20 +38,20 @@
                         <GroupBox Margin="5">
                             <GroupBox.Header>Crawl Options</GroupBox.Header>
                             <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10">Follow External Links</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10">Download External Content</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10" ToolTip="Follow links to all domains, unchecked will limit links to the target site.">Follow External Links</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10" ToolTip="Include content (js,css,image,json) from sites outside the target site.">Download External Content</CheckBox>
                                 <!--<CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>-->
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects">Follow Redirects</CheckBox>
+                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects" ToolTip="Follows up to 10 redirects">Follow Redirects</CheckBox>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.UseCookies, Mode=TwoWay}" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
                             </WrapPanel>
                         </GroupBox>
                     </WrapPanel>
                     <WrapPanel>
                         <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click">Pause</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click">Resume</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnDrainStop" Click="BtnDrainStop_Click">Drain Stop</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click">Hard Stop</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click" IsEnabled="False">Pause</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click" IsEnabled="False">Resume</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnDrainStop" Click="BtnDrainStop_Click" IsEnabled="False">Drain Stop</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click" IsEnabled="False">Hard Stop</Button>
                     </WrapPanel>
                     <StackPanel>
                         <StackPanel.DataContext>
