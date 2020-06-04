@@ -13,7 +13,7 @@ namespace ItsyBitsy.Domain
     public abstract class CrawlWorkerBase : ICrawlWorker
     {
         private readonly Thread _workerThread;
-        private readonly bool _separateThread;
+        protected readonly bool _separateThread;
         public CrawlWorkerBase(bool separateThread)
         {
             _separateThread = separateThread;

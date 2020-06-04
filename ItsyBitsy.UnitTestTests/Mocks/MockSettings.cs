@@ -7,9 +7,9 @@ namespace ItsyBitsy.UnitTest.Mocks
 {
     public class MockSettings : ISettings
     {
-        public bool FollowExtenalLinks { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool DownloadExternalContent { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool FollowRedirects { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool UseCookies { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool FollowExtenalLinks { get; set; }
+        public bool DownloadExternalContent { get; set; }
+        public bool FollowRedirects { get; set; }
+        public bool UseCookies { get; set; }
     }
 }

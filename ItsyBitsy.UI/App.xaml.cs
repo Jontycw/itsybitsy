@@ -1,4 +1,5 @@
 ﻿using ItsyBitsy.Domain;
+using System.Net.Http;
 using System.Windows;
 using System.Windows.Threading;
 
@@ -12,6 +13,7 @@ namespace ItsyBitsy.UI
         public App()
         {
             Factory.Register<IRepository, Repository>();
+            Factory.Register<HttpClientHandler, HttpClientHandler>();
             Exit += App_Exit;
         }
 

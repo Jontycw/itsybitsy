@@ -13,9 +13,9 @@ namespace ItsyBitsy.UnitTest
         {
             Assert.IsTrue(Crawler.NewLinks.Count == 0);
 
-            var website = new Website(new Data.Website() { Seed = "http://seed.co.za/" });
+            var website = new Website(new Data.Website() { Seed = Const.SEED });
             var processor = new Processor(website, 1, new MockSettings(), new MockProgess(), false);
-            Crawler.DownloadResults.Add(new DownloadResult(new ParentLink("http://seed.co.za/link", null)) 
+            Crawler.DownloadResults.Add(new DownloadResult(new ParentLink(Const.LINK1, null)) 
             {
                 Content = MockHtml.Has7Links,
                 ContentType = ContentType.Html,

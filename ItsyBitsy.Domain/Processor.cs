@@ -34,29 +34,37 @@ namespace ItsyBitsy.Domain
             var docNode = doc.DocumentNode;
             bool foundLinks = false;
 
-            foreach (HtmlNode link in docNode?.SelectNodes("//a[@href] | //link[@href]"))
+            try
             {
-                HtmlAttribute att = link.Attributes["href"];
-                var pageLink = att.Value;
-                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                foreach (HtmlNode link in docNode?.SelectNodes("//a[@href] | //link[@href]"))
                 {
-                    Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                    _progress.TotalInQueue++;
-                    foundLinks = true;
+                    HtmlAttribute att = link.Attributes["href"];
+                    var pageLink = att.Value;
+                    if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                    {
+                        Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                        _progress.TotalInQueue++;
+                        foundLinks = true;
+                    }
                 }
             }
+            catch { } //empty doc, ignore
 
-            foreach (HtmlNode link in docNode?.SelectNodes("//script[@src] | //img[@src]"))
+            try
             {
-                HtmlAttribute att = link.Attributes["src"];
-                var pageLink = att.Value;
-                if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                foreach (HtmlNode link in docNode?.SelectNodes("//script[@src] | //img[@src]"))
                 {
-                    Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                    _progress.TotalInQueue++;
-                    foundLinks = true;
+                    HtmlAttribute att = link.Attributes["src"];
+                    var pageLink = att.Value;
+                    if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
+                    {
+                        Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                        _progress.TotalInQueue++;
+                        foundLinks = true;
+                    }
                 }
             }
+            catch { } //empty doc, ignore
 
             if (!foundLinks && Crawler.DownloadResults.IsCompleted)
             {

@@ -32,15 +32,13 @@ namespace ItsyBitsy.Domain
             _progress = progress;
             ServicePointManager.DefaultConnectionLimit = 50;
             _semaphoreSlim = new SemaphoreSlim(20);
-            HttpClientHandler handler = new HttpClientHandler()
-            {
-                AllowAutoRedirect = settings.FollowRedirects,
-                MaxAutomaticRedirections = 10,
-                AutomaticDecompression = DecompressionMethods.All,
-                CookieContainer = new CookieContainer(),
-                MaxConnectionsPerServer = 15,
-                UseCookies = settings.UseCookies,
-            };
+            var handler = Factory.GetInstance<HttpClientHandler>();
+            handler.AllowAutoRedirect = settings.FollowRedirects;
+            handler.MaxAutomaticRedirections = 10;
+            handler.AutomaticDecompression = DecompressionMethods.All;
+            handler.CookieContainer = new CookieContainer();
+            handler.MaxConnectionsPerServer = 15;
+            handler.UseCookies = settings.UseCookies;
 
             _followExternalLinks = settings.FollowExtenalLinks;
             _downloadExternalContent = settings.DownloadExternalContent;
@@ -64,65 +62,76 @@ namespace ItsyBitsy.Domain
                 var nextLink = Crawler.DownloadQueue.Take();
                 _semaphoreSlim.Wait();
 
-                Task.Run(async () =>
+                if (_separateThread)
                 {
-                    DownloadResult result = new DownloadResult(nextLink);
-
-                    bool isDomainResource = result.Uri.StartsWith(_seed);
-                    bool shouldAddLink(ContentType x) => (x == ContentType.Html && (_followExternalLinks || isDomainResource))
-                            || (x != ContentType.Html && (_downloadExternalContent || isDomainResource));
-
-                    try
+                    Task.Run(async () =>
                     {
-                        Stopwatch watch = new Stopwatch();
-
-                        watch.Start();
-                        var getResult = await _client.GetAsync(result.Uri);
-                        watch.Stop();
-                        result.Status = ((int)getResult.StatusCode).ToString();
-
-                        if (getResult.IsSuccessStatusCode)
-                        {
-                            _progress.TotalSuccess++;
-                            result.IsSuccessCode = true;
-                            var resultContent = getResult.Content;
-                            result.ContentType = GetContentType(resultContent.Headers.ContentType?.MediaType);
-
-                            if (shouldAddLink(result.ContentType))
-                            {
-                                var bytes = await resultContent.ReadAsByteArrayAsync();
-                                result.ContentLengthBytes = bytes.Length;
-                                result.Content = Encoding.ASCII.GetString(bytes);
-                                result.DownloadTime = watch.ElapsedMilliseconds;
-                                result.Redirectedto = getResult.RequestMessage.RequestUri.AbsoluteUri;
-                            }
-                        }
-                    }
-                    catch (HttpRequestException e)
+                        await DownloadLinkAsync(nextLink);
+                    })
+                    .ContinueWith((x) =>
                     {
-                        result.Exception = e;
-                        Console.WriteLine($"ERROR: {nextLink.Link}, {e.Message}");
-                    }
-                    finally
-                    {
-                        _progress.TotalCrawled++;
-                        if (shouldAddLink(result.ContentType))
-                        {
-                            _progress.Add(result.ToViewdownloadResult());
-                            Crawler.DownloadResults.Add(result);
-                        }
-                    }
-
-                })
-                .ContinueWith((x) =>
+                        _semaphoreSlim.Release();
+                    });
+                }
+                else
                 {
+                    DownloadLinkAsync(nextLink).Wait();
                     _semaphoreSlim.Release();
-
-                });
+                }
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
+            }
+        }
+
+        private async Task DownloadLinkAsync(ParentLink nextLink)
+        {
+            DownloadResult result = new DownloadResult(nextLink);
+
+            bool isDomainResource = result.Uri.StartsWith(_seed);
+            bool shouldAddLink(ContentType x) => (x == ContentType.Html && (_followExternalLinks || isDomainResource))
+                    || (x != ContentType.Html && (_downloadExternalContent || isDomainResource));
+
+            try
+            {
+                Stopwatch watch = new Stopwatch();
+
+                watch.Start();
+                var getResult = await _client.GetAsync(result.Uri);
+                watch.Stop();
+                result.Status = ((int)getResult.StatusCode).ToString();
+
+                if (getResult.IsSuccessStatusCode)
+                {
+                    _progress.TotalSuccess++;
+                    result.IsSuccessCode = true;
+                    var resultContent = getResult.Content;
+                    result.ContentType = GetContentType(resultContent.Headers.ContentType?.MediaType);
+
+                    if (shouldAddLink(result.ContentType))
+                    {
+                        var bytes = await resultContent.ReadAsByteArrayAsync();
+                        result.ContentLengthBytes = bytes.Length;
+                        result.Content = Encoding.ASCII.GetString(bytes);
+                        result.DownloadTime = watch.ElapsedMilliseconds;
+                        result.Redirectedto = getResult.RequestMessage.RequestUri.AbsoluteUri;
+                    }
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                result.Exception = e;
+                Console.WriteLine($"ERROR: {nextLink.Link}, {e.Message}");
+            }
+            finally
+            {
+                _progress.TotalCrawled++;
+                if (shouldAddLink(result.ContentType))
+                {
+                    _progress.Add(result.ToViewdownloadResult());
+                    Crawler.DownloadResults.Add(result);
+                }
             }
         }
 

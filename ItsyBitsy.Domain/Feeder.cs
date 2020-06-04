@@ -76,6 +76,15 @@ namespace ItsyBitsy.Domain
             {
                 PopulateQueueFromDatabase();
             }
+
+            if(Crawler.DownloadQueue.FirstOrDefault() == null
+                && Crawler.NewLinks.FirstOrDefault() == null
+                && Crawler.DownloadResults.FirstOrDefault() == null)
+            {
+                Crawler.NewLinks.CompleteAdding();
+                Crawler.DownloadQueue.CompleteAdding();
+                Crawler.DownloadResults.CompleteAdding();
+            }
         }
 
         private void PopulateQueueFromDatabase()

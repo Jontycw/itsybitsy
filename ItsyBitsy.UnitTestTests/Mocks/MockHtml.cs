@@ -6,7 +6,6 @@
             <html lang=""en"">
             <head>
               <meta charset=""utf-8"">
-              <meta property=""og:url"" content=""https://docs.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-dotnet-test"">
               <title>The HTML5 Herald</title>
               <meta name=""description"" content=""The HTML5 Herald"">
               <meta name=""author"" content=""SitePoint"">
@@ -20,6 +19,32 @@
               <div>word</div>
               <a href=""/d"">fourth link</a>
               <a href=""A"">fith link</a>
+            </body>
+            </html>";
+
+        public static string Has1Link = @"<!doctype html>
+            <html lang=""en"">
+            <head>
+              <meta charset=""utf-8"">
+              <title>The HTML5 Herald</title>
+              <meta name=""description"" content=""The HTML5 Herald"">
+              <meta name=""author"" content=""SitePoint"">
+            </head>
+            <body>
+              <a href=""https://seed.co.za/FirstLink/"">first link</a>
+            </body>
+            </html>";
+
+        public static string HasLink2 = $@"<!doctype html>
+            <html lang=""en"">
+            <head>
+              <meta charset=""utf-8"">
+              <title>The HTML5 Herald</title>
+              <meta name=""description"" content=""The HTML5 Herald"">
+              <meta name=""author"" content=""SitePoint"">
+            </head>
+            <body>
+              <a href=""{Const.LINK2}"">first link</a>
             </body>
             </html>";
     }

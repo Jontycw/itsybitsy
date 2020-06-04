@@ -17,8 +17,7 @@ namespace ItsyBitsy.UnitTest
             Assert.IsTrue(Crawler.NewLinks.Count == 0);
             Assert.IsTrue(Crawler.DownloadQueue.Count == 0);
 
-            const string mockSeed = "https://seed.co.za/";
-            var seedParentLink = new ParentLink(mockSeed, null);
+            var seedParentLink = new ParentLink(Const.SEED, null);
 
             var feeder = new Feeder(1, 1, new MockProgess());
             feeder.Start();
@@ -46,12 +45,9 @@ namespace ItsyBitsy.UnitTest
             Assert.IsTrue(Crawler.DownloadQueue.Count == 0);
             Assert.IsTrue(Crawler.DownloadResults.Count == 0);
 
-            const string mockSeed = "https://seed.co.za/";
-            const string link2 = "https://seed.co.za/link2/";
-            const string link3 = "https://seed.co.za/link3/";
-            var seedParentLink = new ParentLink(mockSeed, null);
-            var link2ParentLink = new ParentLink(link2, 1);
-            var link3ParentLink = new ParentLink(link3, 1);
+            var seedParentLink = new ParentLink(Const.SEED, null);
+            var link2ParentLink = new ParentLink(Const.LINK1, 1);
+            var link3ParentLink = new ParentLink(Const.LINK2, 1);
             var mockProgrss = new MockProgess();
 
             var feeder = new Feeder(1, 1, mockProgrss);
@@ -72,9 +68,9 @@ namespace ItsyBitsy.UnitTest
             Assert.AreEqual(3, Crawler.DownloadQueue.Count);
 
             //the links should come in the order they were added.
-            Assert.AreEqual(mockSeed, Crawler.DownloadQueue.Take().Link);
-            Assert.AreEqual(link2, Crawler.DownloadQueue.Take().Link);
-            Assert.AreEqual(link3, Crawler.DownloadQueue.Take().Link);
+            Assert.AreEqual(Const.SEED, Crawler.DownloadQueue.Take().Link);
+            Assert.AreEqual(Const.LINK1, Crawler.DownloadQueue.Take().Link);
+            Assert.AreEqual(Const.LINK2, Crawler.DownloadQueue.Take().Link);
 
             feeder.Stop();
             Thread.Sleep(1000);
