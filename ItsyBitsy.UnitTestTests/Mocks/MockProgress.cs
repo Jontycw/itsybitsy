@@ -7,9 +7,9 @@ namespace ItsyBitsy.UnitTest
 {
     public class MockProgess : ICrawlProgress
     {
-        public int TotalInQueue { get; set; }
-        public int TotalCrawled { get; set; }
-        public int TotalSuccess { get; set; }
+        public int TotalLinkCount { get; set; }
+        public int LinksAcknowledged { get; set; }
+        public int TotalLinksDownloaded { get; set; }
 
         public string StatusText => "";
 

@@ -43,7 +43,7 @@ namespace ItsyBitsy.Domain
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
                         Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                        _progress.TotalInQueue++;
+                        _progress.TotalLinkCount++;
                         foundLinks = true;
                     }
                 }
@@ -59,7 +59,7 @@ namespace ItsyBitsy.Domain
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
                         Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                        _progress.TotalInQueue++;
+                        _progress.TotalLinkCount++;
                         foundLinks = true;
                     }
                 }

@@ -22,28 +22,28 @@ namespace ItsyBitsy.UI
             BindingOperations.EnableCollectionSynchronization(RecentResults, _lock);
         }
 
-        int _totalInQueue = 0;
-        public int TotalInQueue
+        int _totalLinkCount = 0;
+        public int TotalLinkCount
         {
-            get { return _totalInQueue; }
-            set { Interlocked.Increment(ref _totalInQueue); }
+            get { return _totalLinkCount; }
+            set { Interlocked.Increment(ref _totalLinkCount); }
         }
 
-        int _totalCrawled = 0;
-        public int TotalCrawled
+        int _linksAcknowledged = 0;
+        public int LinksAcknowledged
         {
-            get { return _totalCrawled; }
-            set { Interlocked.Increment(ref _totalCrawled); }
+            get { return _linksAcknowledged; }
+            set { Interlocked.Increment(ref _linksAcknowledged); }
         }
 
-        int _totalSuccess = 0;
-        public int TotalSuccess
+        int _totalLinksDownloaded = 0;
+        public int TotalLinksDownloaded
         {
-            get { return _totalSuccess; }
-            set { Interlocked.Increment(ref _totalSuccess); }
+            get { return _totalLinksDownloaded; }
+            set { Interlocked.Increment(ref _totalLinksDownloaded); }
         }
 
-        public string StatusText => _totalSuccess > 0 ? $"{_totalCrawled}/{_totalInQueue} {((_totalCrawled * 1.0) / _totalInQueue * 100.0):0.##}%" : string.Empty;
+        public string StatusText => _totalLinksDownloaded > 0 ? $"{_linksAcknowledged}/{_totalLinkCount} {((_linksAcknowledged * 1.0) / _totalLinkCount * 100.0):0.##}%" : string.Empty;
 
         public void Add(DownloadResult downloadResult)
         {

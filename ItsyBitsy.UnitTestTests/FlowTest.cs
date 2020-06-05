@@ -17,27 +17,27 @@ namespace ItsyBitsy.UnitTest
             var processor = new Processor(new Website(new Data.Website() { Id = 1, Seed = Const.SEED }), 1, new MockSettings(), progress, false);
 
             //mock behaviour from Crawler.Start
-            progress.TotalInQueue++;
+            progress.TotalLinkCount++;
             Crawler.NewLinks.Add(new ParentLink(Const.SEED, null));
 
-            Assert.AreEqual(1, progress.TotalInQueue);
+            Assert.AreEqual(1, progress.TotalLinkCount);
             feeder.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(0, progress.TotalCrawled);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
             Assert.AreEqual(1, Crawler.DownloadQueue.Count);
 
             downloader.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalCrawled);
-            Assert.AreEqual(1, progress.TotalSuccess);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(1, Crawler.DownloadResults.Count);
 
             processor.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalSuccess);
-            Assert.AreEqual(1, progress.TotalCrawled);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
@@ -52,55 +52,54 @@ namespace ItsyBitsy.UnitTest
             var processor = new Processor(new Website(new Data.Website() { Id = 1, Seed = Const.SEED }), 1, new MockSettings(), progress, false);
 
             //mock behaviour from Crawler.Start
-            progress.TotalInQueue++;
             Crawler.NewLinks.Add(new ParentLink(Const.LINK1, 1));
-            Assert.AreEqual(1, progress.TotalInQueue);
+            Assert.AreEqual(0, progress.TotalLinkCount);
             Assert.AreEqual(1, Crawler.NewLinks.Count);
 
             feeder.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(0, progress.TotalCrawled);
+            Assert.AreEqual(0, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(1, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
 
             downloader.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalCrawled);
-            Assert.AreEqual(1, progress.TotalSuccess);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
+            Assert.AreEqual(0, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(1, Crawler.DownloadResults.Count);
 
             processor.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalSuccess);
-            Assert.AreEqual(1, progress.TotalCrawled);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(1, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
 
             //2nd iteration for new link
             feeder.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalSuccess);
-            Assert.AreEqual(1, progress.TotalCrawled);
+            Assert.AreEqual(2, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(1, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
 
             downloader.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(2, progress.TotalCrawled);
-            Assert.AreEqual(2, progress.TotalSuccess);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(2, progress.LinksAcknowledged);
+            Assert.AreEqual(2, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(1, Crawler.DownloadResults.Count);
 
             processor.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(2, progress.TotalSuccess);
-            Assert.AreEqual(2, progress.TotalCrawled);
+            Assert.AreEqual(2, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(2, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
@@ -115,39 +114,38 @@ namespace ItsyBitsy.UnitTest
             var processor = new Processor(new Website(new Data.Website() { Id = 1, Seed = Const.SEED }), 1, new MockSettings(), progress, false);
 
             //mock behaviour from Crawler.Start
-            progress.TotalInQueue++;
             Crawler.NewLinks.Add(new ParentLink(Const.LINK2, 1));
-            Assert.AreEqual(1, progress.TotalInQueue);
+            Assert.AreEqual(0, progress.TotalLinkCount);
             Assert.AreEqual(1, Crawler.NewLinks.Count);
 
             feeder.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(0, progress.TotalCrawled);
+            Assert.AreEqual(0, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(1, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
 
             downloader.Start();
-            Assert.AreEqual(1, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalCrawled);
-            Assert.AreEqual(1, progress.TotalSuccess);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
+            Assert.AreEqual(0, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(1, Crawler.DownloadResults.Count);
 
             processor.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalSuccess);
-            Assert.AreEqual(1, progress.TotalCrawled);
+            Assert.AreEqual(1, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(1, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);
 
             //2nd iteration for already crawled link, don't crawl duplicates.
             feeder.Start();
-            Assert.AreEqual(2, progress.TotalInQueue);
-            Assert.AreEqual(1, progress.TotalSuccess);
-            Assert.AreEqual(2, progress.TotalCrawled);
+            Assert.AreEqual(2, progress.LinksAcknowledged);
+            Assert.AreEqual(1, progress.TotalLinkCount);
+            Assert.AreEqual(1, progress.TotalLinksDownloaded);
             Assert.AreEqual(0, Crawler.NewLinks.Count);
             Assert.AreEqual(0, Crawler.DownloadQueue.Count);
             Assert.AreEqual(0, Crawler.DownloadResults.Count);

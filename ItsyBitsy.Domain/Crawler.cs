@@ -19,9 +19,9 @@ namespace ItsyBitsy.Domain
 
     public interface ICrawlProgress
     {
-        int TotalInQueue { get; set; }
-        int TotalCrawled { get; set; }
-        int TotalSuccess { get; set; }
+        int TotalLinkCount { get; set; }
+        int LinksAcknowledged { get; set; }
+        int TotalLinksDownloaded { get; set; }
         string StatusText { get; }
         public void Add(DownloadResult downloadResult);
     }
@@ -76,8 +76,7 @@ namespace ItsyBitsy.Domain
             for (int i = 0; i < _crawlWorkers.Length; i++)
                 _crawlWorkers[i].Start();
 
-            _progress.TotalInQueue++;
-            DownloadQueue.Add(new ParentLink(website.Seed.ToString(), null));
+            NewLinks.Add(new ParentLink(website.Seed.ToString(), null));
         }
 
         public async Task Pause()

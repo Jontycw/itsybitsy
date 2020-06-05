@@ -62,10 +62,11 @@ namespace ItsyBitsy.Domain
         {
             if (Crawler.NewLinks.TryTake(out ParentLink nextLink, 1000))
             {
+                _progress.LinksAcknowledged++;
+
                 if (!_alreadyCrawled.Add(nextLink.Link) || _repository.PageExists(nextLink.Link, _sessionId)
                     || _blacklist.Any(x => nextLink.Link.StartsWith(x)))
                 {
-                    _progress.TotalCrawled++;
                     return;
                 }
 
@@ -77,14 +78,14 @@ namespace ItsyBitsy.Domain
                 PopulateQueueFromDatabase();
             }
 
-            if(Crawler.DownloadQueue.FirstOrDefault() == null
-                && Crawler.NewLinks.FirstOrDefault() == null
-                && Crawler.DownloadResults.FirstOrDefault() == null)
-            {
-                Crawler.NewLinks.CompleteAdding();
-                Crawler.DownloadQueue.CompleteAdding();
-                Crawler.DownloadResults.CompleteAdding();
-            }
+            //if(Crawler.DownloadQueue.FirstOrDefault() == null
+            //    && Crawler.NewLinks.FirstOrDefault() == null
+            //    && Crawler.DownloadResults.FirstOrDefault() == null)
+            //{
+            //    Crawler.NewLinks.CompleteAdding();
+            //    Crawler.DownloadQueue.CompleteAdding();
+            //    Crawler.DownloadResults.CompleteAdding();
+            //}
         }
 
         private void PopulateQueueFromDatabase()

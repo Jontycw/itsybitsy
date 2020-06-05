@@ -19,7 +19,7 @@ namespace ItsyBitsy.Crawler
             t1.Join();
             t2.Join();
 
-            Console.WriteLine(prog.TotalInQueue);
+            Console.WriteLine(prog.TotalLinkCount);
             Console.ReadLine();
         }
 
@@ -27,7 +27,7 @@ namespace ItsyBitsy.Crawler
         {
             for (int i = 0; i < 100; i++)
             {
-                prog.TotalInQueue++;
+                prog.TotalLinkCount++;
             }
         }
     }

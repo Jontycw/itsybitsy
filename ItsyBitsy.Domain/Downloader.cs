@@ -104,7 +104,7 @@ namespace ItsyBitsy.Domain
 
                 if (getResult.IsSuccessStatusCode)
                 {
-                    _progress.TotalSuccess++;
+                    _progress.TotalLinksDownloaded++;
                     result.IsSuccessCode = true;
                     var resultContent = getResult.Content;
                     result.ContentType = GetContentType(resultContent.Headers.ContentType?.MediaType);
@@ -126,7 +126,6 @@ namespace ItsyBitsy.Domain
             }
             finally
             {
-                _progress.TotalCrawled++;
                 if (shouldAddLink(result.ContentType))
                 {
                     _progress.Add(result.ToViewdownloadResult());
