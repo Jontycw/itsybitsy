@@ -76,6 +76,7 @@ namespace ItsyBitsy.Domain
             for (int i = 0; i < _crawlWorkers.Length; i++)
                 _crawlWorkers[i].Start();
 
+            _progress.TotalLinkCount++;
             NewLinks.Add(new ParentLink(website.Seed.ToString(), null));
         }
 
