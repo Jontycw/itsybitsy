@@ -1,6 +1,5 @@
 ﻿using ItsyBitsy.Data;
 using Microsoft.EntityFrameworkCore.Internal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,7 +52,7 @@ namespace ItsyBitsy.Domain
         }
         protected override bool TerminateCondition() => _progress.TotalLinks > 1 && _progress.TotalLinks == _progress.TotalDiscarded + _progress.TotalDownloadResult;
 
-        private HashSet<string> _blacklist = new HashSet<string>()
+        private readonly HashSet<string> _blacklist = new HashSet<string>()
         {
             "https://www.googletagmanager.com",
             "https://www.google.com"

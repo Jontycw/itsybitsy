@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +13,7 @@ namespace ItsyBitsy.UnitTest.Mocks
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if(request.RequestUri.AbsoluteUri == Const.LINK1)
+            if (request.RequestUri.AbsoluteUri == Const.LINK1)
                 return Task.FromResult(new HttpResponseMessage()
                 {
                     StatusCode = System.Net.HttpStatusCode.OK,

@@ -1,7 +1,6 @@
 using ItsyBitsy.Domain;
 using ItsyBitsy.UnitTest.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace ItsyBitsy.UnitTest
 {
@@ -15,7 +14,7 @@ namespace ItsyBitsy.UnitTest
 
             var website = new Website(new Data.Website() { Seed = Const.SEED });
             var processor = new Processor(website, 1, new MockSettings(), new MockProgess(), false);
-            Crawler.DownloadResults.Add(new DownloadResult(new ParentLink(Const.LINK1, null)) 
+            Crawler.DownloadResults.Add(new DownloadResult(new ParentLink(Const.LINK1, null))
             {
                 Content = MockHtml.Has7Links,
                 ContentType = ContentType.Html,

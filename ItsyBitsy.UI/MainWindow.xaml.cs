@@ -49,6 +49,11 @@ namespace ItsyBitsy.UI
             _crawlManager.Resume();
         }
 
+        private async void BtnStop_Click(object sender, RoutedEventArgs e)
+        {
+            await _crawlManager.HardStop();
+        }
+
         private async void AddWebsite_Click(object sender, RoutedEventArgs e)
         {
             var seed = websiteSeed.Text;

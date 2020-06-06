@@ -1,7 +1,5 @@
 ﻿using ItsyBitsy.Domain;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace ItsyBitsy.UnitTest
 {
@@ -13,7 +11,7 @@ namespace ItsyBitsy.UnitTest
 
         public string StatusText => "";
 
-        private List<DownloadResult> result = new List<DownloadResult>();
+        private readonly List<DownloadResult> result = new List<DownloadResult>();
         public void Add(DownloadResult downloadResult)
         {
             result.Add(downloadResult);

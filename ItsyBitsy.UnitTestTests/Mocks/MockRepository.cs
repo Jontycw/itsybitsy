@@ -1,16 +1,13 @@
 ﻿using ItsyBitsy.Data;
 using ItsyBitsy.Domain;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace ItsyBitsy.UnitTest
 {
     public class MockRepository : IRepository
     {
-        private List<ProcessQueue> _processQueues = new List<ProcessQueue>();
+        private readonly List<ProcessQueue> _processQueues = new List<ProcessQueue>();
         int primaryKey = 0;
 
         public void AddToProcessQueue(string link, int parentId, int websiteId, int sessionId)

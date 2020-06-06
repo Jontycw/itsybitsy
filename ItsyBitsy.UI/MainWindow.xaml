@@ -50,7 +50,7 @@
                         <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
                         <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click" IsEnabled="False">Pause</Button>
                         <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click" IsEnabled="False">Resume</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click" IsEnabled="False">Hard Stop</Button>
+                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnStop_Click" IsEnabled="False">Stop</Button>
                     </WrapPanel>
                     <StackPanel>
                         <StackPanel.DataContext>
@@ -75,7 +75,11 @@
                     </StackPanel>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="Past Sessions" />
+            <TabItem Header="Past Sessions">
+                <StackPanel Margin="5">
+                    
+                </StackPanel>
+            </TabItem>
         </TabControl>
     </Grid>
 </Window>

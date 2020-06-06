@@ -1,7 +1,7 @@
 ﻿using ItsyBitsy.Domain;
+using ItsyBitsy.UnitTest.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Net.Http;
-using ItsyBitsy.UnitTest.Mocks;
 
 namespace ItsyBitsy.UnitTest
 {

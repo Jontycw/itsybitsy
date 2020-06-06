@@ -1,10 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using ItsyBitsy.Domain;
-using System.Threading;
+﻿using ItsyBitsy.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Threading;
 
 namespace ItsyBitsy.UnitTest
 {

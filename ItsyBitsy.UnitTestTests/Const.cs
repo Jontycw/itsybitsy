@@ -1,9 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ItsyBitsy.UnitTest
+﻿namespace ItsyBitsy.UnitTest
 {
     public static class Const
     {

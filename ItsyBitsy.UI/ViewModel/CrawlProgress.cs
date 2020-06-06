@@ -36,7 +36,7 @@ namespace ItsyBitsy.UI
             set { Interlocked.Increment(ref _totalDiscarded); }
         }
 
-        public int TotalProgress =>  _totalDiscarded + _totalDownloadResult;
+        public int TotalProgress => _totalDiscarded + _totalDownloadResult;
 
         int _totalDownloadResult = 0;
         public int TotalDownloadResult
