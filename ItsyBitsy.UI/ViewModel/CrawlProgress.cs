@@ -22,28 +22,30 @@ namespace ItsyBitsy.UI
             BindingOperations.EnableCollectionSynchronization(RecentResults, _lock);
         }
 
-        int _totalLinkCount = 0;
-        public int TotalLinkCount
+        int _totalLinks = 0;
+        public int TotalLinks
         {
-            get { return _totalLinkCount; }
-            set { Interlocked.Increment(ref _totalLinkCount); }
+            get { return _totalLinks; }
+            set { Interlocked.Increment(ref _totalLinks); }
         }
 
-        int _linksAcknowledged = 0;
-        public int LinksAcknowledged
+        int _totalDiscarded = 0;
+        public int TotalDiscarded
         {
-            get { return _linksAcknowledged; }
-            set { Interlocked.Increment(ref _linksAcknowledged); }
+            get { return _totalDiscarded; }
+            set { Interlocked.Increment(ref _totalDiscarded); }
         }
 
-        int _totalLinksDownloaded = 0;
-        public int TotalLinksDownloaded
+        public int TotalProgress =>  _totalDiscarded + _totalDownloadResult;
+
+        int _totalDownloadResult = 0;
+        public int TotalDownloadResult
         {
-            get { return _totalLinksDownloaded; }
-            set { Interlocked.Increment(ref _totalLinksDownloaded); }
+            get { return _totalDownloadResult; }
+            set { Interlocked.Increment(ref _totalDownloadResult); }
         }
 
-        public string StatusText => _totalLinksDownloaded > 0 ? $"{_linksAcknowledged}/{_totalLinkCount} {((_linksAcknowledged * 1.0) / _totalLinkCount * 100.0):0.##}%" : string.Empty;
+        public string StatusText => _totalLinks > 0 ? $"{_totalDiscarded + _totalDownloadResult}/{_totalLinks} {(((_totalDiscarded + _totalDownloadResult) * 1.0) / _totalLinks * 100.0):0.##}%" : string.Empty;
 
         public void Add(DownloadResult downloadResult)
         {
@@ -52,9 +54,9 @@ namespace ItsyBitsy.UI
                 RecentResults.RemoveAt(49);
             ContentTypeDistribution[downloadResult.ContentType]++;
 
-            NotifyPropertyChanged("TotalInQueue");
-            NotifyPropertyChanged("TotalCrawled");
+            NotifyPropertyChanged("TotalLinks");
             NotifyPropertyChanged("Statustext");
+            NotifyPropertyChanged("TotalProgress");
         }
 
         private Dictionary<ContentType, int> ContentTypeDistribution { get; } = new Dictionary<ContentType, int>()

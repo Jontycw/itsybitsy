@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -59,7 +60,22 @@ namespace ItsyBitsy.Domain
         {
             try
             {
-                var nextLink = Crawler.DownloadQueue.Take();
+                if (!Crawler.DownloadQueue.TryTake(out ParentLink nextLink, 1000))
+                {
+                    //if (_progress.TotalLinkCount == _progress.LinksAcknowledged
+                    //    && _semaphoreSlim.CurrentCount == 20
+                    //    && Crawler.DownloadQueue.FirstOrDefault() == null
+                    //    && Crawler.NewLinks.FirstOrDefault() == null
+                    //    && Crawler.DownloadResults.FirstOrDefault() == null)
+                    //{
+                    //    Crawler.NewLinks.CompleteAdding();
+                    //    Crawler.DownloadQueue.CompleteAdding();
+                    //    Crawler.DownloadResults.CompleteAdding();
+                    //}
+
+                    return;
+                }
+
                 _semaphoreSlim.Wait();
 
                 if (_separateThread)
@@ -70,12 +86,14 @@ namespace ItsyBitsy.Domain
                     })
                     .ContinueWith((x) =>
                     {
+                        _progress.TotalDownloadResult++;
                         _semaphoreSlim.Release();
                     });
                 }
                 else
                 {
                     DownloadLinkAsync(nextLink).Wait();
+                    _progress.TotalDownloadResult++;
                     _semaphoreSlim.Release();
                 }
             }
@@ -104,7 +122,6 @@ namespace ItsyBitsy.Domain
 
                 if (getResult.IsSuccessStatusCode)
                 {
-                    _progress.TotalLinksDownloaded++;
                     result.IsSuccessCode = true;
                     var resultContent = getResult.Content;
                     result.ContentType = GetContentType(resultContent.Headers.ContentType?.MediaType);
@@ -134,7 +151,7 @@ namespace ItsyBitsy.Domain
             }
         }
 
-        protected override bool TerminateCondition() => Crawler.DownloadQueue.IsCompleted;
+        protected override bool TerminateCondition() => _progress.TotalLinks > 1 && _progress.TotalLinks == _progress.TotalDiscarded + _progress.TotalDownloadResult;
 
         private ContentType GetContentType(string mediaType)
         {

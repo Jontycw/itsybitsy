@@ -50,14 +50,13 @@
                         <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
                         <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click" IsEnabled="False">Pause</Button>
                         <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click" IsEnabled="False">Resume</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnDrainStop" Click="BtnDrainStop_Click" IsEnabled="False">Drain Stop</Button>
                         <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnHardStop_Click" IsEnabled="False">Hard Stop</Button>
                     </WrapPanel>
                     <StackPanel>
                         <StackPanel.DataContext>
                             <Binding Source="{x:Static local:CrawlProgress.Instance}" />
                         </StackPanel.DataContext>
-                        <ProgressBar Height="20" Margin="5" Value="{Binding TotalCrawled, Mode=OneWay}" Maximum="{Binding TotalInQueue, Mode=OneWay}" x:Name="crawlProgressBar" />
+                        <ProgressBar Height="20" Margin="5" Value="{Binding TotalProgress, Mode=OneWay}" Maximum="{Binding TotalLinks, Mode=OneWay}" x:Name="crawlProgressBar" />
                         <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
                         <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress" 
                                         ItemsSource="{Binding RecentResults, Mode=OneWay}"

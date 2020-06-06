@@ -27,7 +27,6 @@ namespace ItsyBitsy.UI
                 btnPause.IsEnabled = true;
                 btnResume.IsEnabled = true;
                 btnHardStop.IsEnabled = true;
-                btnDrainStop.IsEnabled = true;
                 await _crawlManager.Start(website);
             }
         }
@@ -40,19 +39,14 @@ namespace ItsyBitsy.UI
             pnlWebsites.IsEnabled = true;
         }
 
-        private async void BtnPause_Click(object sender, RoutedEventArgs e)
+        private void BtnPause_Click(object sender, RoutedEventArgs e)
         {
-            await _crawlManager.Pause();
+            _crawlManager.Pause();
         }
 
-        private async void BtnResume_Click(object sender, RoutedEventArgs e)
+        private void BtnResume_Click(object sender, RoutedEventArgs e)
         {
-            await _crawlManager.Resume();
-        }
-
-        private void BtnDrainStop_Click(object sender, RoutedEventArgs e)
-        {
-            _crawlManager.DrawinStop();
+            _crawlManager.Resume();
         }
 
         private async void AddWebsite_Click(object sender, RoutedEventArgs e)

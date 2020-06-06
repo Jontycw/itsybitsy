@@ -8,7 +8,7 @@ namespace ItsyBitsy.Crawler
     public class CrawlProgress : ICrawlProgress
     {
         int _totalInQueue;
-        public int TotalLinkCount
+        public int TotalLinks
         {
             get { return _totalInQueue; }
             set
@@ -16,9 +16,9 @@ namespace ItsyBitsy.Crawler
                 Interlocked.Increment(ref _totalInQueue);
             }
         }
-        public int LinksAcknowledged { get; set; }
-        public int TotalLinksDownloaded { get; set; }
-        public string StatusText => TotalLinkCount > 0 ? $"{LinksAcknowledged}/{TotalLinkCount} {((LinksAcknowledged * 1.0) / TotalLinkCount * 100.0):0.##}% Errors:{LinksAcknowledged - TotalLinksDownloaded}" : string.Empty;
+        public int TotalDiscarded { get; set; }
+        public int TotalDownloadResult { get; set; }
+        public string StatusText => TotalLinks > 0 ? $"{TotalDiscarded}/{TotalLinks} {((TotalDiscarded * 1.0) / TotalLinks * 100.0):0.##}% Errors:{TotalDiscarded - TotalDownloadResult}" : string.Empty;
 
         public void Add(ContentType contentType)
         {

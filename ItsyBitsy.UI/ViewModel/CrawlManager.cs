@@ -24,24 +24,18 @@ namespace ItsyBitsy.UI
             await _crawler.HardStop();
         }
 
-        public void DrawinStop()
+        public void Pause()
         {
-            _crawler.DrainStop();
+            _crawler.Pause();
         }
 
-        public async Task Pause()
+        public void Resume()
         {
-            await _crawler.Pause();
-        }
-
-        public async Task Resume()
-        {
-            await _crawler.Resume();
+            _crawler.Resume();
         }
 
         public class ProgressEventArgs : EventArgs
         {
-
             public ProgressEventArgs(CrawlProgress progress)
             {
                 Progress = progress;

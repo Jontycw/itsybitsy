@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.ComponentModel;
+using System.Threading;
 
 namespace ItsyBitsy.Domain
 {
@@ -21,6 +23,13 @@ namespace ItsyBitsy.Domain
             {
                 IsBackground = true
             };
+        }
+
+        public event EventHandler WorkerComplete;
+
+        protected virtual void RaiseWorkerComplete()
+        {
+            WorkerComplete?.Invoke(this, new EventArgs());
         }
 
         protected abstract void DoWorkInternal();
@@ -71,6 +80,10 @@ namespace ItsyBitsy.Domain
             catch
             {
                 State = WorkerState.StoppedUnexpectedly;
+            }
+            finally
+            {
+                RaiseWorkerComplete();
             }
         }
 

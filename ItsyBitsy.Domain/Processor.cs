@@ -23,7 +23,9 @@ namespace ItsyBitsy.Domain
 
         protected override void DoWorkInternal()
         {
-            var downloadQueueItem = Crawler.DownloadResults.Take();
+            if (!Crawler.DownloadResults.TryTake(out DownloadResult downloadQueueItem, 1000))
+                return;
+
             var pageId = _repository.SaveLink(downloadQueueItem, _website.Id, _sessionId);
 
             if (downloadQueueItem.ContentType != ContentType.Html)
@@ -43,7 +45,7 @@ namespace ItsyBitsy.Domain
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
                         Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                        _progress.TotalLinkCount++;
+                        _progress.TotalLinks++;
                         foundLinks = true;
                     }
                 }
@@ -59,7 +61,7 @@ namespace ItsyBitsy.Domain
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
                         Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
-                        _progress.TotalLinkCount++;
+                        _progress.TotalLinks++;
                         foundLinks = true;
                     }
                 }
@@ -72,7 +74,7 @@ namespace ItsyBitsy.Domain
             }
         }
 
-        protected override bool TerminateCondition() => Crawler.DownloadResults.IsCompleted;
+        protected override bool TerminateCondition() => _progress.TotalLinks > 1 && _progress.TotalLinks == _progress.TotalDiscarded + _progress.TotalDownloadResult;
 
         internal static bool IsHttpUri(string uri)
         {

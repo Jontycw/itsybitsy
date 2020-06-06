@@ -1,6 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace ItsyBitsy.Domain
 {
@@ -11,6 +14,7 @@ namespace ItsyBitsy.Domain
 
     public interface ICrawlWorker
     {
+        event EventHandler WorkerComplete;
         void Start();
         void Stop();
         void Pause();
@@ -19,9 +23,9 @@ namespace ItsyBitsy.Domain
 
     public interface ICrawlProgress
     {
-        int TotalLinkCount { get; set; }
-        int LinksAcknowledged { get; set; }
-        int TotalLinksDownloaded { get; set; }
+        int TotalLinks { get; set; }
+        int TotalDiscarded { get; set; }
+        int TotalDownloadResult { get; set; }
         string StatusText { get; }
         public void Add(DownloadResult downloadResult);
     }
@@ -44,7 +48,6 @@ namespace ItsyBitsy.Domain
     {
         private int _sessionId;
         private readonly CancellationTokenSource _tokenSource;
-        private readonly PauseTokenSource _pauseToken;
         private readonly ISettings _settings;
         private readonly ICrawlProgress _progress;
 
@@ -58,7 +61,6 @@ namespace ItsyBitsy.Domain
         public Crawler(ICrawlProgress progress, ISettings settings)
         {
             _tokenSource = new CancellationTokenSource();
-            _pauseToken = new PauseTokenSource();
             _settings = settings;
             _progress = progress;
         }
@@ -74,29 +76,41 @@ namespace ItsyBitsy.Domain
             };
 
             for (int i = 0; i < _crawlWorkers.Length; i++)
+            {
+                _crawlWorkers[i].WorkerComplete += Crawler_WorkerComplete;
                 _crawlWorkers[i].Start();
+            }
 
-            _progress.TotalLinkCount++;
-            NewLinks.Add(new ParentLink(website.Seed.ToString(), null));
+            _progress.TotalLinks++;
+            DownloadQueue.Add(new ParentLink(website.Seed.ToString(), null));
         }
 
-        public async Task Pause()
+        bool sessionEnded = false;
+        private async void Crawler_WorkerComplete(object sender, EventArgs e)
         {
-            await _pauseToken.PauseAsync();
+            if (!sessionEnded)
+            {
+                sessionEnded = true;
+                await Repository.EndSession(_sessionId);
+            }
         }
 
-        public async Task Resume()
+        public void Pause()
         {
-            await _pauseToken.ResumeAsync();
+            for (int i = 0; i < _crawlWorkers.Length; i++)
+                _crawlWorkers[i].Pause();
+        }
+
+        public void Resume()
+        {
+            for (int i = 0; i < _crawlWorkers.Length; i++)
+                _crawlWorkers[i].Resume();
         }
 
         public async Task HardStop()
         {
             _tokenSource.Cancel();
             await Repository.EndSession(_sessionId);
-        }
-        public void DrainStop()
-        {
         }
     }
 }

@@ -60,31 +60,39 @@ namespace ItsyBitsy.Domain
 
         public int SaveLink(DownloadResult response, int websiteId, int sessionId)
         {
-            using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
-            var newPage = new Page()
+            try
             {
-                SessionId = sessionId,
-                StatusCode = response.Status,
-                WebsiteId = websiteId,
-                Uri = response.Uri,
-                ContentType = (byte)response.ContentType,
-                DownloadTime = response.DownloadTime,
-                ContentLength = response.ContentLengthBytes
-            };
-            context.Page.Add(newPage);
-
-            if (response.ParentId.HasValue)
-            {
-                var newPageRelation = new PageRelation()
+                using ItsyBitsyDbContext context = new ItsyBitsyDbContext();
+                var newPage = new Page()
                 {
-                    ParentPageId = response.ParentId.Value,
-                    ChildPage = newPage,
+                    SessionId = sessionId,
+                    StatusCode = response.Status,
+                    WebsiteId = websiteId,
+                    Uri = response.Uri,
+                    ContentType = (byte)response.ContentType,
+                    DownloadTime = response.DownloadTime,
+                    ContentLength = response.ContentLengthBytes
                 };
-                context.PageRelation.Add(newPageRelation);
-            }
+                context.Page.Add(newPage);
 
-            context.SaveChanges();
-            return newPage.Id;
+                if (response.ParentId.HasValue)
+                {
+                    var newPageRelation = new PageRelation()
+                    {
+                        ParentPageId = response.ParentId.Value,
+                        ChildPage = newPage,
+                    };
+                    context.PageRelation.Add(newPageRelation);
+                }
+
+                context.SaveChanges();
+
+                return newPage.Id;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
 
         public static List<Website> GetWebsites()
@@ -117,7 +125,7 @@ namespace ItsyBitsy.Domain
             return session.Id;
         }
 
-        
+
 
         public static async Task<Website> CreateWebsite(string seed)
         {

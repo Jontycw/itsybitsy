@@ -1,5 +1,6 @@
 ﻿using ItsyBitsy.Data;
 using Microsoft.EntityFrameworkCore.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,7 +51,7 @@ namespace ItsyBitsy.Domain
             _progress = progress;
             _repository = Factory.GetInstance<IRepository>();
         }
-        protected override bool TerminateCondition() => Crawler.NewLinks.IsCompleted;
+        protected override bool TerminateCondition() => _progress.TotalLinks > 1 && _progress.TotalLinks == _progress.TotalDiscarded + _progress.TotalDownloadResult;
 
         private HashSet<string> _blacklist = new HashSet<string>()
         {
@@ -62,11 +63,10 @@ namespace ItsyBitsy.Domain
         {
             if (Crawler.NewLinks.TryTake(out ParentLink nextLink, 1000))
             {
-                _progress.LinksAcknowledged++;
-
                 if (!_alreadyCrawled.Add(nextLink.Link) || _repository.PageExists(nextLink.Link, _sessionId)
                     || _blacklist.Any(x => nextLink.Link.StartsWith(x)))
                 {
+                    _progress.TotalDiscarded++;
                     return;
                 }
 
@@ -77,15 +77,6 @@ namespace ItsyBitsy.Domain
             {
                 PopulateQueueFromDatabase();
             }
-
-            //if(Crawler.DownloadQueue.FirstOrDefault() == null
-            //    && Crawler.NewLinks.FirstOrDefault() == null
-            //    && Crawler.DownloadResults.FirstOrDefault() == null)
-            //{
-            //    Crawler.NewLinks.CompleteAdding();
-            //    Crawler.DownloadQueue.CompleteAdding();
-            //    Crawler.DownloadResults.CompleteAdding();
-            //}
         }
 
         private void PopulateQueueFromDatabase()
