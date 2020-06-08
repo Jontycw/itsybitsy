@@ -50,9 +50,9 @@ namespace ItsyBitsy.Domain
         private readonly ICrawlProgress _progress;
 
         private const int MaxCollectionSize = 1000;
-        public static readonly BlockingCollection<ParentLink> DownloadQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
-        public static readonly BlockingCollection<ParentLink> NewLinks = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
-        public static readonly BlockingCollection<DownloadResult> DownloadResults = new BlockingCollection<DownloadResult>(new ConcurrentQueue<DownloadResult>(), 10);
+        private BlockingCollection<ParentLink> _newLinks = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
+        private BlockingCollection<ParentLink> _downloadQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), MaxCollectionSize);
+        private BlockingCollection<DownloadResult> _downloadResults = new BlockingCollection<DownloadResult>(new ConcurrentQueue<DownloadResult>(), 10);
 
         private ICrawlWorker[] _crawlWorkers;
 
@@ -68,9 +68,9 @@ namespace ItsyBitsy.Domain
             _sessionId = sessionId;
             _crawlWorkers = new CrawlWorkerBase[3]
             {
-                new Feeder(website.Id, sessionId, _progress),
-                new Downloader(website.Seed, _settings, _progress),
-                new Processor(website, sessionId, _settings, _progress),
+                new Feeder(_newLinks, _downloadQueue, website.Id, sessionId, _progress),
+                new Downloader(_downloadQueue, _downloadResults, website.Seed, _settings, _progress),
+                new Processor(_downloadResults, _newLinks, website, sessionId, _settings, _progress),
             };
 
             for (int i = 0; i < _crawlWorkers.Length; i++)
@@ -80,7 +80,7 @@ namespace ItsyBitsy.Domain
             }
 
             _progress.TotalLinks++;
-            DownloadQueue.Add(new ParentLink(website.Seed.ToString(), null));
+            _downloadQueue.Add(new ParentLink(website.Seed.ToString(), null));
         }
 
         bool sessionEnded = false;
@@ -89,7 +89,7 @@ namespace ItsyBitsy.Domain
             if (!sessionEnded)
             {
                 sessionEnded = true;
-                await Repository.EndSession(_sessionId);
+                await HardStop();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Collections.Concurrent;
 
 namespace ItsyBitsy.Domain
 {
@@ -9,11 +10,15 @@ namespace ItsyBitsy.Domain
         private readonly int _sessionId;
         private readonly Website _website;
         private readonly ICrawlProgress _progress;
-        private readonly IRepository _repository;
+        private readonly IRepository _repository; 
+        private BlockingCollection<ParentLink> _newLinks;
+        private BlockingCollection<DownloadResult> _downloadResults;
 
-        public Processor(Website website, int sessionId, ISettings settings, ICrawlProgress progress, bool separateThread = true)
+        public Processor(BlockingCollection<DownloadResult> downloadResults, BlockingCollection<ParentLink> newLinks, Website website, int sessionId, ISettings settings, ICrawlProgress progress, bool separateThread = true)
             : base(separateThread)
         {
+            _newLinks = newLinks;
+            _downloadResults = downloadResults;
             _settings = settings;
             _website = website;
             _sessionId = sessionId;
@@ -23,7 +28,7 @@ namespace ItsyBitsy.Domain
 
         protected override void DoWorkInternal()
         {
-            if (!Crawler.DownloadResults.TryTake(out DownloadResult downloadQueueItem, 1000))
+            if (!_downloadResults.TryTake(out DownloadResult downloadQueueItem, 1000))
                 return;
 
             var pageId = _repository.SaveLink(downloadQueueItem, _website.Id, _sessionId);
@@ -44,7 +49,7 @@ namespace ItsyBitsy.Domain
                     var pageLink = att.Value;
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
-                        Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                        _newLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
                         _progress.TotalLinks++;
                         foundLinks = true;
                     }
@@ -60,7 +65,7 @@ namespace ItsyBitsy.Domain
                     var pageLink = att.Value;
                     if (Uri.TryCreate(_website.Seed, pageLink, out Uri absoluteUri) && IsHttpUri(absoluteUri.AbsoluteUri))
                     {
-                        Crawler.NewLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
+                        _newLinks.Add(new ParentLink(absoluteUri.AbsoluteUri, pageId));
                         _progress.TotalLinks++;
                         foundLinks = true;
                     }
@@ -68,9 +73,9 @@ namespace ItsyBitsy.Domain
             }
             catch { } //empty doc, ignore
 
-            if (!foundLinks && Crawler.DownloadResults.IsCompleted)
+            if (!foundLinks && _downloadResults.IsCompleted)
             {
-                Crawler.NewLinks.CompleteAdding();
+                _newLinks.CompleteAdding();
             }
         }
 

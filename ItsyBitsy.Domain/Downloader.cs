@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
@@ -24,10 +25,14 @@ namespace ItsyBitsy.Domain
         private readonly SemaphoreSlim _semaphoreSlim;
         private readonly ICrawlProgress _progress;
         private readonly string _seed;
+        private BlockingCollection<ParentLink> _downloadQueue;
+        private BlockingCollection<DownloadResult> _downloadResults;
 
-        public Downloader(Uri host, ISettings settings, ICrawlProgress progress, bool separateThread = true)
+        public Downloader(BlockingCollection<ParentLink> downloadQueue, BlockingCollection<DownloadResult> downloadResults, Uri host, ISettings settings, ICrawlProgress progress, bool separateThread = true)
             : base(separateThread)
         {
+            _downloadQueue = downloadQueue;
+            _downloadResults = downloadResults;
             _seed = string.Intern(host.ToString());
             _progress = progress;
             ServicePointManager.DefaultConnectionLimit = 50;
@@ -59,7 +64,7 @@ namespace ItsyBitsy.Domain
         {
             try
             {
-                if (!Crawler.DownloadQueue.TryTake(out ParentLink nextLink, 1000))
+                if (!_downloadQueue.TryTake(out ParentLink nextLink, 1000))
                 {
                     //if (_progress.TotalLinkCount == _progress.LinksAcknowledged
                     //    && _semaphoreSlim.CurrentCount == 20
@@ -145,7 +150,7 @@ namespace ItsyBitsy.Domain
                 if (shouldAddLink(result.ContentType))
                 {
                     _progress.Add(result.ToViewdownloadResult());
-                    Crawler.DownloadResults.Add(result);
+                    _downloadResults.Add(result);
                 }
             }
         }

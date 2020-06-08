@@ -1,5 +1,6 @@
 ﻿using ItsyBitsy.Data;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,10 +41,14 @@ namespace ItsyBitsy.Domain
         private readonly int _sessionId;
         private readonly ICrawlProgress _progress;
         private readonly IRepository _repository;
+        private BlockingCollection<ParentLink> _newLinks;
+        private BlockingCollection<ParentLink> _downloadQueue;
 
-        public Feeder(int websiteId, int sessionId, ICrawlProgress progress, bool separateThread = true)
+        public Feeder(BlockingCollection<ParentLink> newLinks, BlockingCollection<ParentLink> downloadQueue, int websiteId, int sessionId, ICrawlProgress progress, bool separateThread = true)
             : base(separateThread)
         {
+            _newLinks = newLinks;
+            _downloadQueue = downloadQueue;
             _websiteId = websiteId;
             _sessionId = sessionId;
             _alreadyCrawled = new HashSet<string>();
@@ -60,7 +65,7 @@ namespace ItsyBitsy.Domain
 
         protected override void DoWorkInternal()
         {
-            if (Crawler.NewLinks.TryTake(out ParentLink nextLink, 1000))
+            if (_newLinks.TryTake(out ParentLink nextLink, 1000))
             {
                 if (!_alreadyCrawled.Add(nextLink.Link) || _repository.PageExists(nextLink.Link, _sessionId)
                     || _blacklist.Any(x => nextLink.Link.StartsWith(x)))
@@ -69,7 +74,7 @@ namespace ItsyBitsy.Domain
                     return;
                 }
 
-                if (!Crawler.DownloadQueue.TryAdd(nextLink, 1000))
+                if (!_downloadQueue.TryAdd(nextLink, 1000))
                     _repository.AddToProcessQueue(nextLink.Link, nextLink.ParentId ?? -1, _websiteId, _sessionId);
             }
             else
@@ -84,7 +89,7 @@ namespace ItsyBitsy.Domain
             var queueItems = _repository.GetProcessQueueItems(_sessionId, _websiteId);
             foreach (var queueItem in queueItems)
             {
-                if (!Crawler.DownloadQueue.TryAdd(new ParentLink(queueItem.Link, queueItem.ParentId), 50))
+                if (!_downloadQueue.TryAdd(new ParentLink(queueItem.Link, queueItem.ParentId), 50))
                     break;
                 else
                     successfullyQueued.Add(queueItem);

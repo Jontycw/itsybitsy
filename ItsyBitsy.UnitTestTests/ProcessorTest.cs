@@ -1,6 +1,7 @@
 using ItsyBitsy.Domain;
 using ItsyBitsy.UnitTest.Mocks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Concurrent;
 
 namespace ItsyBitsy.UnitTest
 {
@@ -10,11 +11,13 @@ namespace ItsyBitsy.UnitTest
         [TestMethod]
         public void LinkExtractionTest()
         {
-            Assert.IsTrue(Crawler.NewLinks.Count == 0);
+            BlockingCollection<ParentLink> _newLinks = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), 1000);
+            BlockingCollection<ParentLink> _downloadQueue = new BlockingCollection<ParentLink>(new ConcurrentQueue<ParentLink>(), 1000);
+            BlockingCollection<DownloadResult> _downloadResults = new BlockingCollection<DownloadResult>(new ConcurrentQueue<DownloadResult>(), 10);
 
             var website = new Website(new Data.Website() { Seed = Const.SEED });
-            var processor = new Processor(website, 1, new MockSettings(), new MockProgess(), false);
-            Crawler.DownloadResults.Add(new DownloadResult(new ParentLink(Const.LINK1, null))
+            var processor = new Processor(_downloadResults, _newLinks, website, 1, new MockSettings(), new MockProgess(), false);
+            _downloadResults.Add(new DownloadResult(new ParentLink(Const.LINK1, null))
             {
                 Content = MockHtml.Has7Links,
                 ContentType = ContentType.Html,
@@ -25,11 +28,7 @@ namespace ItsyBitsy.UnitTest
             });
             processor.Start();
 
-            Assert.AreEqual(7, Crawler.NewLinks.Count);
-
-            while (Crawler.NewLinks.Count > 0)
-                Crawler.NewLinks.Take();
-
+            Assert.AreEqual(7, _newLinks.Count);
             processor.Stop();
         }
     }

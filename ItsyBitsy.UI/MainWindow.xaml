@@ -8,24 +8,28 @@
     <Grid>
         <TabControl>
             <TabItem Header="Setup Crawl">
-                <StackPanel Margin="5">
-                    <WrapPanel Margin="5" Name="pnlWebsites">
-                        <WrapPanel.DataContext>
-                            <Binding Source="{x:Static local:CrawlContext.Instance}" />
-                        </WrapPanel.DataContext>
+                <DockPanel>
+                    <DockPanel.DataContext>
+                        <Binding Source="{x:Static local:CrawlProgress.Instance}" />
+                    </DockPanel.DataContext>
+                    <StackPanel Margin="5" DockPanel.Dock="Top">
+                        <WrapPanel Margin="5" Name="pnlWebsites">
+                            <WrapPanel.DataContext>
+                                <Binding Source="{x:Static local:CrawlContext.Instance}" />
+                            </WrapPanel.DataContext>
                             <Label>Websites</Label>
-                        <ComboBox Name="selectedWebsite" Width="200"
+                            <ComboBox Name="selectedWebsite" Width="200"
                                   ItemsSource="{Binding Path=WebsiteSeeds}" 
                                   SelectedItem="{Binding Path=SelectedWebsite}"
                                   SelectedValue="{Binding Path=SelectedWebsite.Id}"></ComboBox>
-                        <TextBox Width="250" Padding="0,3" Margin="15,0,0,0" x:Name="websiteSeed" Text="https://"></TextBox>
-                        <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add Website</Button>
-                    </WrapPanel>
-                    <WrapPanel Name="pnlSettings">
-                        <WrapPanel.DataContext>
-                            <Binding Source="{x:Static local:Settings.Instance}" />
-                        </WrapPanel.DataContext>
-                        <!--<GroupBox Margin="5">
+                            <TextBox Width="250" Padding="0,3" Margin="15,0,0,0" x:Name="websiteSeed" Text="https://"></TextBox>
+                            <Button Margin="5,0" Padding="10,0" x:Name="AddWebsite" Click="AddWebsite_Click">Add Website</Button>
+                        </WrapPanel>
+                        <WrapPanel Name="pnlSettings">
+                            <WrapPanel.DataContext>
+                                <Binding Source="{x:Static local:Settings.Instance}" />
+                            </WrapPanel.DataContext>
+                            <!--<GroupBox Margin="5">
                             <GroupBox.Header>Include Content Types</GroupBox.Header>
                             <WrapPanel>
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding IncludeImages, Mode=TwoWay}" Margin="10">Image</CheckBox>
@@ -35,50 +39,75 @@
                                 <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.IncludeOther, Mode=TwoWay}" Margin="10" Name="contentOther">Other</CheckBox>
                             </WrapPanel>
                         </GroupBox>-->
-                        <GroupBox Margin="5">
-                            <GroupBox.Header>Crawl Options</GroupBox.Header>
-                            <WrapPanel>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10" ToolTip="Follow links to all domains, unchecked will limit links to the target site.">Follow External Links</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10" ToolTip="Include content (js,css,image,json) from sites outside the target site.">Download External Content</CheckBox>
-                                <!--<CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>-->
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects" ToolTip="Follows up to 10 redirects">Follow Redirects</CheckBox>
-                                <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.UseCookies, Mode=TwoWay}" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
-                            </WrapPanel>
-                        </GroupBox>
-                    </WrapPanel>
-                    <WrapPanel>
-                        <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click" IsEnabled="False">Pause</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click" IsEnabled="False">Resume</Button>
-                        <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnStop_Click" IsEnabled="False">Stop</Button>
-                    </WrapPanel>
-                    <StackPanel>
-                        <StackPanel.DataContext>
-                            <Binding Source="{x:Static local:CrawlProgress.Instance}" />
-                        </StackPanel.DataContext>
-                        <ProgressBar Height="20" Margin="5" Value="{Binding TotalProgress, Mode=OneWay}" Maximum="{Binding TotalLinks, Mode=OneWay}" x:Name="crawlProgressBar" />
-                        <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
-                        <DataGrid VerticalAlignment="Bottom" Name="crawlLinkProgress" 
-                                        ItemsSource="{Binding RecentResults, Mode=OneWay}"
-                                        AutoGenerateColumns="False"
-                                        VerticalScrollBarVisibility="Visible"
-                                        AlternatingRowBackground="AntiqueWhite"
-                                        Height="530">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Url" Binding="{Binding Uri}" MaxWidth="600" />
-                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
-                                <DataGridTextColumn Header="DownloadTime (ms)" Binding="{Binding DownloadTime}" />
-                                <DataGridTextColumn Header="Content Length (bytes)" Binding="{Binding ContentLengthBytes}" />
-                                <DataGridTextColumn Header="ContentType" Binding="{Binding ContentType}" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                            <GroupBox Margin="5">
+                                <GroupBox.Header>Crawl Options</GroupBox.Header>
+                                <WrapPanel>
+                                    <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowExtenalLinks, Mode=TwoWay}" Margin="10" ToolTip="Follow links to all domains, unchecked will limit links to the target site.">Follow External Links</CheckBox>
+                                    <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.DownloadExternalContent, Mode=TwoWay}" Margin="10" ToolTip="Include content (js,css,image,json) from sites outside the target site.">Download External Content</CheckBox>
+                                    <!--<CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.RespectRobots, Mode=TwoWay}" Margin="10" Name="optionRespectRobots">Respect Robots.txt</CheckBox>-->
+                                    <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.FollowRedirects, Mode=TwoWay}" Margin="10" Name="optionFollowRedirects" ToolTip="Follows up to 10 redirects">Follow Redirects</CheckBox>
+                                    <CheckBox HorizontalAlignment="Left" IsChecked="{Binding Instance.UseCookies, Mode=TwoWay}" Margin="10" Name="optionUseCookies">Use Cookies</CheckBox>
+                                </WrapPanel>
+                            </GroupBox>
+                        </WrapPanel>
+                        <WrapPanel>
+                            <Button Margin="10" Padding="15,5" Name="btnStart" Click="BtnStart_Click">Start</Button>
+                            <Button Margin="10" Padding="15,5" Name="btnPause" Click="BtnPause_Click" IsEnabled="False">Pause</Button>
+                            <Button Margin="10" Padding="15,5" Name="btnResume" Click="BtnResume_Click" IsEnabled="False">Resume</Button>
+                            <Button Margin="10" Padding="15,5" Name="btnHardStop" Click="BtnStop_Click" IsEnabled="False">Stop</Button>
+                        </WrapPanel>
+                        <StackPanel>
+                            <StackPanel.DataContext>
+                                <Binding Source="{x:Static local:CrawlProgress.Instance}" />
+                            </StackPanel.DataContext>
+                            <ProgressBar Height="20" Margin="5" Value="{Binding TotalProgress, Mode=OneWay}" Maximum="{Binding TotalLinks, Mode=OneWay}" x:Name="crawlProgressBar" />
+                            <Label Name="crawlProgressLabel" HorizontalAlignment="Right" Content="{Binding StatusText, Mode=OneWay}" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                    <DataGrid DockPanel.Dock="Bottom" VerticalAlignment="Stretch" Name="crawlLinkProgress" 
+                                            ItemsSource="{Binding RecentResults, Mode=OneWay}"
+                                            AutoGenerateColumns="False"
+                                            VerticalScrollBarVisibility="Visible"
+                                            AlternatingRowBackground="AntiqueWhite"
+                                            HorizontalAlignment="Stretch">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Url" Binding="{Binding Uri}" MaxWidth="600" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" />
+                            <DataGridTextColumn Header="DownloadTime (ms)" Binding="{Binding DownloadTime}" />
+                            <DataGridTextColumn Header="Content Length (bytes)" Binding="{Binding ContentLengthBytes}" />
+                            <DataGridTextColumn Header="ContentType" Binding="{Binding ContentType}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Past Sessions">
-                <StackPanel Margin="5">
-                    
-                </StackPanel>
+                <DockPanel>
+                    <DockPanel.DataContext>
+                        <Binding Source="{x:Static local:CrawlProgress.Instance}" />
+                    </DockPanel.DataContext>
+                    <DockPanel Margin="5" DockPanel.Dock="Top">
+                        <GroupBox DockPanel.Dock="Left" Margin="5">
+                            <GroupBox.Header>Slowest Pages</GroupBox.Header>
+                            <StackPanel>
+                                <Label Name="slow1">https://testlink.co.za/link1</Label>
+                                <Label Name="slow2">https://testlink.co.za/link2</Label>
+                                <Label Name="slow3">https://testlink.co.za/link3</Label>
+                                <Label Name="slow4">https://testlink.co.za/link4</Label>
+                                <Label Name="slow5">https://testlink.co.za/link5</Label>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox DockPanel.Dock="Right" Margin="5">
+                            <GroupBox.Header>Slowest Pages</GroupBox.Header>
+                            <StackPanel>
+                                <Label Name="slow6">https://testlink.co.za/link1</Label>
+                                <Label Name="slow7">https://testlink.co.za/link2</Label>
+                                <Label Name="slow8">https://testlink.co.za/link3</Label>
+                                <Label Name="slow9">https://testlink.co.za/link4</Label>
+                                <Label Name="slow10">https://testlink.co.za/link5</Label>
+                            </StackPanel>
+                        </GroupBox>
+                    </DockPanel>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </Grid>

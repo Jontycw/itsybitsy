@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MindFusion.Charting.Wpf" Version="2.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ItsyBitsy.Domain\ItsyBitsy.Domain.csproj" />
   </ItemGroup>
 
